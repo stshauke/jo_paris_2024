@@ -2,6 +2,7 @@ package com.jo_paris_2024.controller;
 
 import com.jo_paris_2024.dto.StadeDTO;
 import com.jo_paris_2024.service.StadeService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class StadeController {
     public StadeDTO saveStade(@RequestBody StadeDTO stadeDTO) {
         return stadeService.saveStade(stadeDTO);
     }
-
+    
     @PutMapping("/updateStade")
     public StadeDTO updateStade(@RequestBody StadeDTO stadeDTO) {
         return stadeService.updateStade(stadeDTO);

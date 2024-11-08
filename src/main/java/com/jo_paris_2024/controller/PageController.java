@@ -6,9 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class PageController {
 
-    @GetMapping("/stade") // Assurez-vous que ce chemin ne cause pas de conflit avec d'autres contrôleurs
+    @GetMapping("/") // Page d'accueil
+    public String indexPage() {
+        return "index"; // Renvoie le fichier index.html
+    }
+
+    @GetMapping("/stade") // Page du stade
     public String stadePage() {
-        return "stade"; // Renvoie le nom du fichier students.html sans extension
+        return "stade"; // Renvoie le fichier stade.html
     }
 }
-
