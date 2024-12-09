@@ -32,14 +32,13 @@ public class StadeService {
     
     
     
-    // Récupère la liste de tous les stades
+ // Récupère la liste de tous les stades
     public List<StadeDTO> getAllStades() {
         List<Stade> stadeList = stadeRepository.findAll();
         return stadeList.stream()
-                        .map(stade -> new StadeDTO(stade.getId_stade(), stade.getNom_stade(), stade.getAdresse_stade()))
+                        .map(stade -> new StadeDTO(stade.getId_stade(), stade.getNom_stade(), stade.getAdresse_stade())) // Corrected here
                         .collect(Collectors.toList());
     }
-
     // Met à jour les informations d'un stade
     public StadeDTO updateStade(StadeDTO stadeDTO) {
         Stade stade = new Stade(stadeDTO.getId_stade(), stadeDTO.getNom_stade(), stadeDTO.getAdresse_stade());
@@ -58,6 +57,6 @@ public class StadeService {
     public StadeDTO getStade(Long stadeId) {
         Stade stade = stadeRepository.findById(stadeId)
                 .orElseThrow(() -> new RuntimeException("Stade not found"));
-        return new StadeDTO(stade.getId_stade(), stade.getNom_stade(), stade.getAdresse_stade());
+        return new StadeDTO();
     }
 }
