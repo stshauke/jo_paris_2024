@@ -85,7 +85,7 @@
 	        const name = document.getElementById('name').value;
 	        const location = document.getElementById('location').value;
 
-	        fetch("http://localhost:8080/api/v1/stades/saveStade", {
+	        fetch("http://localhost:9090/api/v1/stades/saveStade", {
 	            method: "POST",
 	            headers: {
 	                "Content-Type": "application/json",
@@ -108,7 +108,7 @@
 	});
 
     function loadStades() {
-        fetch('http://localhost:8080/api/v1/stades/getAllStades')
+        fetch('http://localhost:9090/api/v1/stades/getAllStades')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById('stadeTableBody');
@@ -138,9 +138,11 @@
     }
 
 	function viewStade(stadeId) {
-	    fetch(`http://localhost:8080/api/v1/stades/${stadeId}`)
+	    fetch(`http://localhost:9090/api/v1/stades/${stadeId}`)
 	        .then(response => response.json())
 	        .then(stade => {
+	        	console.log(stade); // Vérifiez ici les données
+	           
 	            document.getElementById('editStadeId').value = stade.id_stade;  // Utilisez id_stade ici
 	            document.getElementById('editName').value = stade.nom_stade;  // Utilisez nom_stade ici
 	            document.getElementById('editLocation').value = stade.adresse_stade;  // Utilisez adresse_stade ici
@@ -159,7 +161,7 @@
 	    const name = document.getElementById('editName').value;
 	    const location = document.getElementById('editLocation').value;
 
-	    fetch('http://localhost:8080/api/v1/stades/updateStade', {
+	    fetch('http://localhost:9090/api/v1/stades/updateStade', {
 	        method: 'PUT',
 	        headers: { 'Content-Type': 'application/json' },
 	        body: JSON.stringify({ id_stade: stadeId, nom_stade: name, adresse_stade: location })  // Assurez-vous que les noms correspondent
@@ -176,7 +178,7 @@
 
 
 	function deleteStade(stadeId) {
-	    fetch(`http://localhost:8080/api/v1/stades/deleteStade`, {
+	    fetch(`http://localhost:9090/api/v1/stades/deleteStade`, {
 	        method: 'DELETE',
 	        headers: { 'Content-Type': 'application/json' },
 	        body: JSON.stringify({ id_stade: stadeId })  // Assurez-vous que l'ID est passé correctement

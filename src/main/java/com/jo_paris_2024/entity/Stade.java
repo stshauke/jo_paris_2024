@@ -4,34 +4,48 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Stade {
-	public Stade(Long id_stade, String nom_stade, String adresse_stade) {
-		// TODO Auto-generated constructor stub
-	}
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Utilise une auto-incrémentation
 
-    private Long id_stade;  // Utilisation du même nom que dans le DTO
-    private String nom_stade;  // Utilisation du même nom que dans le DTO
-    private String adresse_stade;  // Utilisation du même nom que dans le DTO
-	public String getNom_stade() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public String getAdresse_stade() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public Long getId_stade() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id_stade;
+    private String nom_stade;
+    private String adresse_stade;
+
+    // Constructeur par défaut
+    public Stade() {}
+
+    // Constructeur avec arguments
+    public Stade(Long id_stade, String nom_stade, String adresse_stade) {
+        this.id_stade = id_stade;
+        this.nom_stade = nom_stade;
+        this.adresse_stade = adresse_stade;
+    }
+
+    // Getters et Setters
+    public Long getId_stade() {
+        return id_stade;
+    }
+
+    public void setId_stade(Long id_stade) {
+        this.id_stade = id_stade;
+    }
+
+    public String getNom_stade() {
+        return nom_stade;
+    }
+
+    public void setNom_stade(String nom_stade) {
+        this.nom_stade = nom_stade;
+    }
+
+    public String getAdresse_stade() {
+        return adresse_stade;
+    }
+
+    public void setAdresse_stade(String adresse_stade) {
+        this.adresse_stade = adresse_stade;
+    }
 }
