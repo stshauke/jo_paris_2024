@@ -53,10 +53,12 @@ public class StadeService {
         return true;
     }
 
-    // Récupère un stade par son ID
+ // Récupère un stade par son ID
     public StadeDTO getStade(Long stadeId) {
         Stade stade = stadeRepository.findById(stadeId)
                 .orElseThrow(() -> new RuntimeException("Stade not found"));
-        return new StadeDTO();
+        // Mapper les propriétés de l'entité Stade vers un DTO
+        return new StadeDTO(stade.getId_stade(), stade.getNom_stade(), stade.getAdresse_stade());
     }
+
 }

@@ -137,19 +137,32 @@
 			
     }
 
-	function viewStade(stadeId) {
-	    fetch(`http://localhost:9090/api/v1/stades/${stadeId}`)
-	        .then(response => response.json())
-	        .then(stade => {
-	        	console.log(stade); // Vérifiez ici les données
-	           
-	            document.getElementById('editStadeId').value = stade.id_stade;  // Utilisez id_stade ici
-	            document.getElementById('editName').value = stade.nom_stade;  // Utilisez nom_stade ici
-	            document.getElementById('editLocation').value = stade.adresse_stade;  // Utilisez adresse_stade ici
-	            new bootstrap.Modal(document.getElementById('stadeModal')).show();
-	        })
-	        .catch(error => console.error('Erreur lors de la récupération des détails:', error));
-	}
+    function viewStade(stadeId) {
+        fetch(`http://localhost:9090/api/v1/stades/${stadeId}`)
+            .then(response => response.json())
+            .then(stade => {
+                console.log('Réponse API:', stade); // Inspectez ici les données reçues
+                
+                // Vérifiez si les éléments DOM existent
+                const stadeIdField = document.getElementById('editStadeId');
+                const nameField = document.getElementById('editName');
+                const locationField = document.getElementById('editLocation');
+
+                if (stadeIdField && nameField && locationField) {
+                    stadeIdField.value = stade.id_stade;
+                    nameField.value = stade.nom_stade;
+                    locationField.value = stade.adresse_stade;
+                    
+                    // Affichez la modale
+                    const modal = new bootstrap.Modal(document.getElementById('stadeModal'));
+                    modal.show();
+                } else {
+                    console.error('Les champs du formulaire ne sont pas trouvés.');
+                }
+            })
+            .catch(error => console.error('Erreur lors de la récupération des détails:', error));
+    }
+
 
 
     function editStade(stadeId) {
