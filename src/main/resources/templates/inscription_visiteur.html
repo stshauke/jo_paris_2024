@@ -2,28 +2,42 @@
 <head th:insert="fragments/headerFragment :: headerFragment"></head>
 
 <body>
-<div class="container mt-5 d-flex justify-content-center align-items-center" style="flex-direction: column; height: 100%;">
-    <h1>Inscription des Visiteurs</h1>
+<div class="container mt-5">
+    <h1 class="text-center">Inscription des Visiteurs</h1>
 
     <!-- Formulaire d'inscription de visiteur -->
     <form id="visiteurForm" class="mb-4">
-        <div class="mb-3">
-            <label for="nom" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="nom" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="nom" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="nom" required>
+            </div>
+            <div class="col-md-6">
+                <label for="prenom" class="form-label">Prénom</label>
+                <input type="text" class="form-control" id="prenom" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="prenom" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="prenom" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="col-md-6">
+                <label for="solde" class="form-label">Solde</label>
+                <input type="number" step="0.01" class="form-control" id="solde" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <div class="col-md-6">
+                <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="solde" class="form-label">Solde</label>
-            <input type="number" step="0.01" class="form-control" id="solde" required>
-        </div>
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
     </form>
 </div>
 
@@ -37,6 +51,23 @@
             const prenom = document.getElementById('prenom').value;
             const email = document.getElementById('email').value;
             const solde = document.getElementById('solde').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Expression régulière pour valider le mot de passe
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            // Vérification si les mots de passe correspondent
+            if (password !== confirmPassword) {
+                alert("Les mots de passe ne correspondent pas.");
+                return;
+            }
+
+            // Vérification de la sécurité du mot de passe
+            if (!passwordRegex.test(password)) {
+                alert("Le mot de passe doit contenir au moins une majuscule, un chiffre, un caractère spécial et 8 caractères.");
+                return;
+            }
 
             fetch("http://localhost:9090/api/v1/visiteurs/saveVisiteur", {
                 method: "POST",
@@ -47,7 +78,8 @@
                     nom_visiteur: nom,
                     prenom_visiteur: prenom,
                     email_visiteur: email,
-                    solde_visiteur: solde
+                    solde_visiteur: solde,
+                    mot_de_passe: password
                 }),
             })
             .then(response => {

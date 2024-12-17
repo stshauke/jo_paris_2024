@@ -35,8 +35,5 @@ public class VisiteurController {
         return visiteurService.updateVisiteur(visiteurDTO);
     }
 
-    @DeleteMapping("/deleteVisiteur")
-    public boolean deleteVisiteur(@RequestBody VisiteurDTO visiteurDTO) {
-        return visiteurService.deleteVisiteur(visiteurDTO);
-    }
+   
 }

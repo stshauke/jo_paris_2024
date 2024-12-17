@@ -10,10 +10,21 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+	@Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+	
+	
+	
+	
+	
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,10 +41,10 @@ public class SecurityConfig {
 
     // Configurer un utilisateur en mémoire avec un mot de passe
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder() // Utilisation de Basic Auth avec un utilisateur en mémoire
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+        UserDetails user = User.builder()
             .username("admin")
-            .password("admin123")
+            .password(passwordEncoder.encode("admin123")) // Hacher le mot de passe avec BCrypt
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);

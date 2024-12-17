@@ -81,7 +81,6 @@ public class VisiteurDTO {
         ", nom_visiteur=" + nom_visiteur + '\'' +
        ", prenom_visiteur=" + prenom_visiteur + '\'' +
         ", email_visiteur=" + email_visiteur + '\'' +
-        ", password_visiteur=" + password_visiteur + '\'' +
         ", solde_visiteur=" + solde_visiteur + '\'' +
         '}';
         
