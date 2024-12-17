@@ -18,7 +18,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-            .requestMatchers("/", "/stade", "/api/v1/stades/**").permitAll() // Autoriser l'accès public à ces URL
+            .requestMatchers("/", "/api/v1/stades/**", "/api/v1/visiteurs/**").permitAll()
+
                 .anyRequest().authenticated() // Authentification requise pour les autres requêtes
             .and()
             .httpBasic() // Activer l'authentification Basic

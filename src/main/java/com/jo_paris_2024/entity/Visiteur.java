@@ -1,29 +1,29 @@
 package com.jo_paris_2024.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "visiteur")
 public class Visiteur {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_visiteur;
+
     private String nom_visiteur;
     private String prenom_visiteur;
     private String email_visiteur;
     private String password_visiteur;
     private BigDecimal solde_visiteur;
 
-    // Constructeur par défaut
-    public Visiteur() {}
+    // Constructeur sans arguments
+    public Visiteur() {
+    }
 
-    // Constructeur avec arguments
-    public Visiteur(Long id_visiteur, String nom_visiteur, String prenom_visiteur, String email_visiteur, String password_visiteur, BigDecimal solde_visiteur) {
+    // Constructeur avec tous les arguments
+    public Visiteur(Long id_visiteur, String nom_visiteur, String prenom_visiteur, 
+                    String email_visiteur, String password_visiteur, BigDecimal solde_visiteur) {
         this.id_visiteur = id_visiteur;
         this.nom_visiteur = nom_visiteur;
         this.prenom_visiteur = prenom_visiteur;

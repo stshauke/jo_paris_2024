@@ -1,0 +1,192 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/headerFragment :: headerFragment"></head>
+
+<body>
+<div class="container mt-5 d-flex justify-content-center align-items-center" style="flex-direction: column; height: 100%;">
+    <h1>Gestion des Visiteurs</h1>
+
+    <!-- Formulaire d'ajout de visiteur -->
+    <form id="visiteurForm" class="mb-4">
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="nom" required>
+        </div>
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="prenom" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="solde" class="form-label">Solde</label>
+            <input type="number" step="0.01" class="form-control" id="solde" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter Visiteur</button>
+    </form>
+
+    <!-- Table des visiteurs -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Solde</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="visiteurTableBody">
+        <!-- Les visiteurs seront ajoutés ici dynamiquement -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal pour voir/modifier les détails du visiteur -->
+<div class="modal fade" id="visiteurModal" tabindex="-1" aria-labelledby="visiteurModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="visiteurModalLabel">Détails du Visiteur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editVisiteurId">
+                <div class="mb-3">
+                    <label for="editNom" class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="editNom">
+                </div>
+                <div class="mb-3">
+                    <label for="editPrenom" class="form-label">Prénom</label>
+                    <input type="text" class="form-control" id="editPrenom">
+                </div>
+                <div class="mb-3">
+                    <label for="editEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="editEmail">
+                </div>
+                <div class="mb-3">
+                    <label for="editSolde" class="form-label">Solde</label>
+                    <input type="number" step="0.01" class="form-control" id="editSolde">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">Enregistrer les modifications</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadVisiteurs();
+
+        // Gestion du formulaire d'ajout
+        document.getElementById('visiteurForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nom = document.getElementById('nom').value;
+            const prenom = document.getElementById('prenom').value;
+            const email = document.getElementById('email').value;
+            const solde = document.getElementById('solde').value;
+
+            fetch("http://localhost:9090/api/v1/visiteurs/saveVisiteur", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nom_visiteur: nom,
+                    prenom_visiteur: prenom,
+                    email_visiteur: email,
+                    solde_visiteur: solde
+                }),
+            })
+            .then(response => response.json())
+            .then(() => loadVisiteurs())
+            .catch(error => console.error("Erreur:", error));
+        });
+    });
+
+    function loadVisiteurs() {
+        fetch('http://localhost:9090/api/v1/visiteurs/getAllVisiteurs')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('visiteurTableBody');
+                tableBody.innerHTML = '';
+                data.forEach(visiteur => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${visiteur.id_visiteur}</td>
+                        <td>${visiteur.nom_visiteur}</td>
+                        <td>${visiteur.prenom_visiteur}</td>
+                        <td>${visiteur.email_visiteur}</td>
+                        <td>${visiteur.solde_visiteur}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm me-2" onclick="viewVisiteur(${visiteur.id_visiteur})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm me-2" onclick="editVisiteur(${visiteur.id_visiteur})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteVisiteur(${visiteur.id_visiteur})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+    }
+
+    function viewVisiteur(id) {
+        fetch(`http://localhost:9090/api/v1/visiteurs/${id}`)
+            .then(response => response.json())
+            .then(visiteur => {
+                document.getElementById('editVisiteurId').value = visiteur.id_visiteur;
+                document.getElementById('editNom').value = visiteur.nom_visiteur;
+                document.getElementById('editPrenom').value = visiteur.prenom_visiteur;
+                document.getElementById('editEmail').value = visiteur.email_visiteur;
+                document.getElementById('editSolde').value = visiteur.solde_visiteur;
+
+                const modal = new bootstrap.Modal(document.getElementById('visiteurModal'));
+                modal.show();
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+
+    function saveChanges() {
+        const id = document.getElementById('editVisiteurId').value;
+        const nom = document.getElementById('editNom').value;
+        const prenom = document.getElementById('editPrenom').value;
+        const email = document.getElementById('editEmail').value;
+        const solde = document.getElementById('editSolde').value;
+
+        fetch("http://localhost:9090/api/v1/visiteurs/updateVisiteur", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id_visiteur: id, nom_visiteur: nom, prenom_visiteur: prenom, email_visiteur: email, solde_visiteur: solde }),
+        })
+        .then(() => loadVisiteurs())
+        .catch(error => console.error("Erreur:", error));
+    }
+
+    function deleteVisiteur(id) {
+        fetch(`http://localhost:9090/api/v1/visiteurs/deleteVisiteur`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id_visiteur: id })
+        })
+        .then(() => loadVisiteurs())
+        .catch(error => console.error("Erreur:", error));
+    }
+</script>
+</body>
+<footer class="footer-section">
+    <head th:insert="fragments/footerFragment :: footerFragment"></head>
+</footer>
+</html>

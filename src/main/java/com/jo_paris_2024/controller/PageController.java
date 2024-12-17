@@ -15,4 +15,12 @@ public class PageController {
     public String stadePage() {
         return "stade"; // Renvoie le fichier stade.html
     }
+    @GetMapping("/visiteur") // Page du stade
+    public String visiteurPage() {
+        return "visiteur"; // Renvoie le fichier stade.html
+    }
+    @GetMapping("/inscription") // Page du stade
+    public String inscription_visiteurPage() {
+        return "inscription_visiteur"; // Renvoie le fichier stade.html
+    }
 }
