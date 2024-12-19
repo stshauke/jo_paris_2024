@@ -2,87 +2,129 @@ package com.jo_paris_2024.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * Classe DTO représentant un visiteur.
+ */
 public class VisiteurDTO {
-	private Long id_visiteur;
-    private String nom_visiteur;
-    private String prenom_visiteur;
-    private String email_visiteur;
-    private String password_visiteur;
-    private BigDecimal solde_visiteur;
+
+    // Identifiant unique du visiteur
+    private Long idVisiteur;
+
+    // Nom du visiteur
+    private String nomVisiteur;
+
+    // Prénom du visiteur
+    private String prenomVisiteur;
+
+    // Email du visiteur
+    private String emailVisiteur;
+
+    // Mot de passe du visiteur (hashé si possible)
+    private String passwordVisiteur;
+
+    // Solde du visiteur
+    private BigDecimal soldeVisiteur;
+
+    // Clé unique du visiteur (optionnelle, à préciser)
+    private String cleVisiteur;
 
     // Constructeur sans arguments
     public VisiteurDTO() {
     }
- // Constructeur avec arguments
-    public VisiteurDTO(Long id_visiteur, String nom_visiteur, String prenom_visiteur, 
-    		String email_visiteur, String password_visiteur, BigDecimal solde_visiteur) {
-        this.id_visiteur = id_visiteur;
-        this.nom_visiteur = nom_visiteur;
-        this.prenom_visiteur = prenom_visiteur;
-        this.email_visiteur = email_visiteur;
-        this.password_visiteur = password_visiteur;
-        this.solde_visiteur = solde_visiteur;
-    }
-    
- // Getters et Setters
-    public Long getId_visiteur() {
-        return id_visiteur;
+
+    // Constructeur avec arguments
+    public VisiteurDTO(Long idVisiteur, String nomVisiteur, String prenomVisiteur,
+                       String emailVisiteur, String passwordVisiteur, BigDecimal soldeVisiteur,
+                       String cleVisiteur) {
+        this.idVisiteur = idVisiteur;
+        this.nomVisiteur = nomVisiteur;
+        this.prenomVisiteur = prenomVisiteur;
+        this.emailVisiteur = emailVisiteur;
+        this.passwordVisiteur = passwordVisiteur;
+        this.soldeVisiteur = soldeVisiteur;
+        this.cleVisiteur = cleVisiteur;
     }
 
-    public void setId_visiteur(Long id_visiteur) {
-        this.id_visiteur = id_visiteur;
+    // Getters et Setters
+
+    public Long getIdVisiteur() {
+        return idVisiteur;
     }
 
-    public String getNom_visiteur() {
-        return nom_visiteur;
+    public void setIdVisiteur(Long idVisiteur) {
+        this.idVisiteur = idVisiteur;
     }
 
-    public void setNom_visiteur(String nom_visiteur) {
-        this.nom_visiteur = nom_visiteur;
+    public String getNomVisiteur() {
+        return nomVisiteur;
     }
 
-    public String getPrenom_visiteur() {
-        return prenom_visiteur;
+    public void setNomVisiteur(String nomVisiteur) {
+        this.nomVisiteur = nomVisiteur;
     }
 
-    public void setPrenom_visiteur(String prenom_visiteur) {
-        this.prenom_visiteur = prenom_visiteur;
+    public String getPrenomVisiteur() {
+        return prenomVisiteur;
     }
 
-    public String getEmail_visiteur() {
-        return email_visiteur;
+    public void setPrenomVisiteur(String prenomVisiteur) {
+        this.prenomVisiteur = prenomVisiteur;
     }
 
-    public void setEmail_visiteur(String email_visiteur) {
-        this.email_visiteur = email_visiteur;
+    public String getEmailVisiteur() {
+        return emailVisiteur;
     }
 
-    public String getPassword_visiteur() {
-        return password_visiteur;
+    public void setEmailVisiteur(String emailVisiteur) {
+        if (emailVisiteur != null && emailVisiteur.contains("@")) {
+            this.emailVisiteur = emailVisiteur;
+        } else {
+            throw new IllegalArgumentException("Email invalide.");
+        }
     }
 
-    public void setPassword_visiteur(String password_visiteur) {
-        this.password_visiteur = password_visiteur;
+    public String getPasswordVisiteur() {
+        return passwordVisiteur;
     }
 
-    public BigDecimal getSolde_visiteur() {
-        return solde_visiteur;
+    public void setPasswordVisiteur(String passwordVisiteur) {
+        if (passwordVisiteur != null && passwordVisiteur.length() >= 8) {
+            this.passwordVisiteur = passwordVisiteur;
+        } else {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins 8 caractères.");
+        }
     }
 
-    public void setSolde_visiteur(BigDecimal solde_visiteur) {
-        this.solde_visiteur = solde_visiteur;
+    public BigDecimal getSoldeVisiteur() {
+        return soldeVisiteur;
     }
-    
- // Méthode toString pour afficher les informations du stade
+
+    public void setSoldeVisiteur(BigDecimal soldeVisiteur) {
+        if (soldeVisiteur != null && soldeVisiteur.compareTo(BigDecimal.ZERO) >= 0) {
+            this.soldeVisiteur = soldeVisiteur;
+        } else {
+            throw new IllegalArgumentException("Le solde ne peut pas être négatif.");
+        }
+    }
+
+    public String getCleVisiteur() {
+        return cleVisiteur;
+    }
+
+    public void setCleVisiteur(String cleVisiteur) {
+        this.cleVisiteur = cleVisiteur;
+    }
+
+    // Méthode toString sécurisée
     @Override
     public String toString() {
         return "VisiteurDTO{" +
-        "id_visiteur=" + id_visiteur+
-        ", nom_visiteur=" + nom_visiteur + '\'' +
-       ", prenom_visiteur=" + prenom_visiteur + '\'' +
-        ", email_visiteur=" + email_visiteur + '\'' +
-        ", solde_visiteur=" + solde_visiteur + '\'' +
-        '}';
-        
+                "idVisiteur=" + idVisiteur +
+                ", nomVisiteur='" + nomVisiteur + '\'' +
+                ", prenomVisiteur='" + prenomVisiteur + '\'' +
+                ", emailVisiteur='" + emailVisiteur + '\'' +
+                ", soldeVisiteur=" + soldeVisiteur +
+                ", cleVisiteur='" + cleVisiteur + '\'' +
+                '}';
     }
 }

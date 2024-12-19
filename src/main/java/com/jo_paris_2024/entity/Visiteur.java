@@ -6,16 +6,18 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "visiteur")
 public class Visiteur {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_visiteur;
 
     private String nom_visiteur;
     private String prenom_visiteur;
-    private String email_visiteur;
+    @Column(name = "email_visiteur", unique = true)
+    private String emailVisiteur;
     private String password_visiteur;
     private BigDecimal solde_visiteur;
+    private String cle_visiteur;
 
     // Constructeur sans arguments
     public Visiteur() {
@@ -23,13 +25,15 @@ public class Visiteur {
 
     // Constructeur avec tous les arguments
     public Visiteur(Long id_visiteur, String nom_visiteur, String prenom_visiteur, 
-                    String email_visiteur, String password_visiteur, BigDecimal solde_visiteur) {
+                    String email_visiteur, String password_visiteur, BigDecimal solde_visiteur,
+                    String cle_visiteur) {
         this.id_visiteur = id_visiteur;
         this.nom_visiteur = nom_visiteur;
         this.prenom_visiteur = prenom_visiteur;
-        this.email_visiteur = email_visiteur;
+        this.emailVisiteur = email_visiteur;
         this.password_visiteur = password_visiteur;
         this.solde_visiteur = solde_visiteur;
+        this.cle_visiteur = cle_visiteur;
     }
 
     // Getters et Setters
@@ -58,11 +62,11 @@ public class Visiteur {
     }
 
     public String getEmail_visiteur() {
-        return email_visiteur;
+        return emailVisiteur;
     }
 
     public void setEmail_visiteur(String email_visiteur) {
-        this.email_visiteur = email_visiteur;
+        this.emailVisiteur = email_visiteur;
     }
 
     public String getPassword_visiteur() {
@@ -79,5 +83,13 @@ public class Visiteur {
 
     public void setSolde_visiteur(BigDecimal solde_visiteur) {
         this.solde_visiteur = solde_visiteur;
+    }
+
+    public String getCle_visiteur() {
+        return cle_visiteur;
+    }
+
+    public void setCle_visiteur(String cle_visiteur) {
+        this.cle_visiteur = cle_visiteur;
     }
 }

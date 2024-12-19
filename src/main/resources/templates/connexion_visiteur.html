@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/headerFragment :: headerFragment">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Visiteur</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Connexion</h1>
+
+        <!-- Formulaire de connexion -->
+        <form id="loginForm" class="mb-4">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Votre email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Votre mot de passe" required minlength="6">
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                <label class="form-check-label" for="rememberMe">Se rappeler de moi</label>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary" id="submitButton">Se connecter</button>
+            </div>
+            <div class="text-center mt-3">
+                <a href="#" class="text-decoration-none">Mot de passe oublié ?</a>
+                <span class="mx-2">|</span>
+                <a href="/inscription" class="text-decoration-none">S'inscrire</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+            const submitButton = document.getElementById('submitButton');
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const rememberMe = document.getElementById('rememberMe').checked;
+
+                if (!email || !password) {
+                    alert("Veuillez remplir tous les champs.");
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Connexion en cours...";
+
+                fetch("http://localhost:9090/api/v1/visiteurs/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password, rememberMe }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || "Erreur de connexion.");
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert("Connexion réussie !");
+                    window.location.href = "/"; // Redirection vers la page de tableau de bord
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+                    alert("Erreur de connexion : " + error.message);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Se connecter";
+                });
+            });
+        });
+    </script>
+    <footer class="footer-section">
+        <!-- Contenu du footer ici -->
+    </footer>
+</body>
+</html>

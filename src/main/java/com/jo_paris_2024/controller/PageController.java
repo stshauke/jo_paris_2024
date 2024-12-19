@@ -23,4 +23,8 @@ public class PageController {
     public String inscription_visiteurPage() {
         return "inscription_visiteur"; // Renvoie le fichier stade.html
     }
+    @GetMapping("/connexion") // Page de connexion
+    public String connexionVisiteurPage() {
+        return "connexion_visiteur"; // Renvoie le fichier connexion_visiteur.html
+    }
 }
