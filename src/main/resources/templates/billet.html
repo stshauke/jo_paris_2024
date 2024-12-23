@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/headerFragment :: headerFragment">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gestion des Billets</h1>
+
+        <!-- Bouton pour ouvrir la modale d'ajout -->
+        <div class="text-start mb-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBilletModal">
+                <i class="fas fa-plus"></i> Ajouter un Billet
+            </button>
+        </div>
+
+        <!-- Tableau des billets -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Prix</th>
+                    <th>Date d'Émission</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="billetTableBody">
+                <!-- Les billets seront insérés dynamiquement -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modale d'ajout d'un billet -->
+    <div class="modal fade" id="addBilletModal" tabindex="-1" aria-labelledby="addBilletModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="billetForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBilletModalLabel">Ajouter un Billet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Nom -->
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom du Billet</label>
+                            <input type="text" class="form-control" id="nom" required>
+                        </div>
+                        <!-- Type -->
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type</label>
+                            <select class="form-select" id="type" required>
+                                <option value="">Sélectionner un type</option>
+                                <option value="Standard">Standard</option>
+                                <option value="VIP">VIP</option>
+                            </select>
+                        </div>
+                        <!-- Prix -->
+                        <div class="mb-3">
+                            <label for="prix" class="form-label">Prix</label>
+                            <input type="number" class="form-control" id="prix" required>
+                        </div>
+                        <!-- Date d'Émission -->
+                        <div class="mb-3">
+                            <label for="dateEmission" class="form-label">Date d'Émission</label>
+                            <input type="date" class="form-control" id="dateEmission" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter Billet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBillets();
+
+            // Gestion du formulaire d'ajout
+            document.getElementById('billetForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const nom = document.getElementById('nom').value;
+                const type = document.getElementById('type').value;
+                const prix = document.getElementById('prix').value;
+                const dateEmission = document.getElementById('dateEmission').value;
+
+                fetch("http://localhost:9090/api/v1/billets/saveBillet", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        nom_billet: nom,
+                        type_billet: type,
+                        prix_billet: prix,
+                        date_emission: dateEmission
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    loadBillets();
+                })
+                .catch(error => console.error("Erreur:", error));
+            });
+        });
+
+        function loadBillets() {
+            fetch('http://localhost:9090/api/v1/billets/getAllBillets')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('billetTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(billet => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${billet.id_billet}</td>
+                            <td>${billet.nom_billet}</td>
+                            <td>${billet.type_billet}</td>
+                            <td>${billet.prix_billet}</td>
+                            <td>${billet.date_emission}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm me-2">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+        }
+    </script>
+</body>
+</html>

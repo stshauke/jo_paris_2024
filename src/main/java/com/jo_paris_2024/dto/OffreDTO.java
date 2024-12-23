@@ -1,7 +1,7 @@
 package com.jo_paris_2024.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class OffreDTO {
 	
@@ -11,7 +11,7 @@ public class OffreDTO {
     private String description_offre;
     private BigDecimal prix_offre;
     private Long nombre_personnes;
-    private Date date_fin_offre;
+    private LocalDate date_fin_offre;
 
     // Constructeur sans arguments
     public OffreDTO() {
@@ -19,7 +19,7 @@ public class OffreDTO {
 
     // Constructeur avec tous les arguments
     public OffreDTO(Long id_offre, String nom_offre, String description_offre, 
-            BigDecimal prix_offre, Long nombre_personnes, Date date_fin_offre) {
+            BigDecimal prix_offre, Long nombre_personnes, LocalDate date_fin_offre) {
     	 this.id_offre = id_offre;
 	        this.nom_offre = nom_offre;
 	        this.description_offre = description_offre;
@@ -70,25 +70,25 @@ public class OffreDTO {
 		this.nombre_personnes = nombre_personnes;
 	}
 
-	public Date getDate_fin_offre() {
+	public LocalDate getDate_fin_offre() {
 		return date_fin_offre;
 	}
 
-	public void setDate_fin_offre(Date date_fin_offre) {
+	public void setDate_fin_offre(LocalDate date_fin_offre) {
 		this.date_fin_offre = date_fin_offre;
 	}
 
 	// Méthode toString pour afficher les informations du stade
-    @Override
-    public String toString() {
-        return "OffreDTO{" +
-                "id_offre=" + id_offre +
-                ", nom_offre='" + nom_offre + '\'' +
-                ", description_offre='" + description_offre + '\'' +
-                 "prix_offre=" + prix_offre +
-                ", nombre_personnes=" + nombre_personnes +
-                ", date_fin_offre='" + date_fin_offre + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+	    return "OffreDTO{" +
+	            "id_offre=" + id_offre +
+	            ", nom_offre='" + nom_offre + '\'' +
+	            ", description_offre='" + description_offre + '\'' +
+	            ", prix_offre=" + prix_offre +
+	            ", nombre_personnes=" + nombre_personnes +
+	            ", date_fin_offre=" + date_fin_offre +
+	            '}';
+	}
 
 }

@@ -1,192 +1,321 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:insert="fragments/headerFragment :: headerFragment"></head>
-
+<head th:insert="fragments/headerFragment :: headerFragment">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
 <body>
-<div class="container mt-5 d-flex justify-content-center align-items-center" style="flex-direction: column; height: 100%;">
-    <h1>Gestion des Visiteurs</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gestion des Offres</h1>
 
-    <!-- Formulaire d'ajout de visiteur -->
-    <form id="visiteurForm" class="mb-4">
-        <div class="mb-3">
-            <label for="nom" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="nom" required>
+        <!-- Bouton pour ouvrir la modale d'ajout -->
+        <div class="text-start mb-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+                <i class="fas fa-plus"></i> Ajouter une Offre
+            </button>
         </div>
-        <div class="mb-3">
-            <label for="prenom" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="prenom" required>
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" required>
-        </div>
-        <div class="mb-3">
-            <label for="solde" class="form-label">Solde</label>
-            <input type="number" step="0.01" class="form-control" id="solde" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Ajouter Visiteur</button>
-    </form>
 
-    <!-- Table des visiteurs -->
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Email</th>
-            <th>Solde</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody id="visiteurTableBody">
-        <!-- Les visiteurs seront ajoutés ici dynamiquement -->
-        </tbody>
-    </table>
+        <!-- Tableau des offres -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Nombre de Personnes</th>
+                    <th>Date de Fin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="offreTableBody">
+                <!-- Les offres seront insérées dynamiquement -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modale d'ajout d'une offre -->
+    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="offreForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addOffreModalLabel">Ajouter une Offre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Ligne pour Nom et Date -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nom" class="form-label">Nom de l'Offre</label>
+                            <input type="text" class="form-control" id="nom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dateFin" class="form-label">Date de Fin</label>
+                            <input type="date" class="form-control" id="dateFin" required>
+                        </div>
+                    </div>
+
+                    <!-- Ligne pour Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3" required></textarea>
+                    </div>
+
+                    <!-- Ligne pour Prix et Nombre de Personnes -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="prix" class="form-label">Prix</label>
+                            <input type="number" class="form-control" id="prix" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nombrePersonnes" class="form-label">Nombre de Personnes</label>
+                            <input type="number" class="form-control" id="nombrePersonnes" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter Offre</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Modal pour voir/modifier les détails du visiteur -->
-<div class="modal fade" id="visiteurModal" tabindex="-1" aria-labelledby="visiteurModalLabel" aria-hidden="true">
+
+    <!-- Modale d'édition d'une offre -->
+<div class="modal fade" id="offreModal" tabindex="-1" aria-labelledby="offreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editOffreForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="offreModalLabel">Modifier l'Offre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editOffreId">
+
+                    <!-- Ligne pour Nom et Date -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editNom" class="form-label">Nom de l'Offre</label>
+                            <input type="text" class="form-control" id="editNom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editDateFin" class="form-label">Date de Fin</label>
+                            <input type="date" class="form-control" id="editDateFin" required>
+                        </div>
+                    </div>
+
+                    <!-- Ligne pour Description -->
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editDescription" rows="3" required></textarea>
+                    </div>
+
+                    <!-- Ligne pour Prix et Nombre de Personnes -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editPrix" class="form-label">Prix</label>
+                            <input type="number" class="form-control" id="editPrix" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editNombrePersonnes" class="form-label">Nombre de Personnes</label>
+                            <input type="number" class="form-control" id="editNombrePersonnes" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" onclick="saveChanges()">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de show (Voir les détails) -->
+<div class="modal fade" id="showOffreModal" tabindex="-1" aria-labelledby="showOffreModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="visiteurModalLabel">Détails du Visiteur</h5>
+                <h5 class="modal-title" id="showOffreModalLabel">Détails de l'Offre</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="editVisiteurId">
-                <div class="mb-3">
-                    <label for="editNom" class="form-label">Nom</label>
-                    <input type="text" class="form-control" id="editNom">
-                </div>
-                <div class="mb-3">
-                    <label for="editPrenom" class="form-label">Prénom</label>
-                    <input type="text" class="form-control" id="editPrenom">
-                </div>
-                <div class="mb-3">
-                    <label for="editEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="editEmail">
-                </div>
-                <div class="mb-3">
-                    <label for="editSolde" class="form-label">Solde</label>
-                    <input type="number" step="0.01" class="form-control" id="editSolde">
-                </div>
+                <p><strong>Nom :</strong> <span id="showNom"></span></p>
+                <p><strong>Description :</strong> <span id="showDescription"></span></p>
+                <p><strong>Prix :</strong> <span id="showPrix"></span></p>
+                <p><strong>Nombre de Personnes :</strong> <span id="showNombrePersonnes"></span></p>
+                <p><strong>Date de Fin :</strong> <span id="showDateFin"></span></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" onclick="saveChanges()">Enregistrer les modifications</button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
-        loadVisiteurs();
+        loadOffres();
 
         // Gestion du formulaire d'ajout
-        document.getElementById('visiteurForm').addEventListener('submit', function (e) {
+        document.getElementById('offreForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const nom = document.getElementById('nom').value;
-            const prenom = document.getElementById('prenom').value;
-            const email = document.getElementById('email').value;
-            const solde = document.getElementById('solde').value;
+            const description = document.getElementById('description').value;
+            const prix = document.getElementById('prix').value;
+            const nombrePersonnes = document.getElementById('nombrePersonnes').value;
+            const dateFin = document.getElementById('dateFin').value;
 
-            fetch("http://localhost:9090/api/v1/visiteurs/saveVisiteur", {
+            fetch("http://localhost:9090/api/v1/offres/saveOffre", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    nom_visiteur: nom,
-                    prenom_visiteur: prenom,
-                    email_visiteur: email,
-                    solde_visiteur: solde
+                    nom_offre: nom,
+                    description_offre: description,
+                    prix_offre: prix,
+                    nombre_personnes: nombrePersonnes,
+                    date_fin_offre: dateFin
                 }),
             })
             .then(response => response.json())
-            .then(() => loadVisiteurs())
+            .then(data => {
+                console.log(data);
+                loadOffres();
+            })
             .catch(error => console.error("Erreur:", error));
         });
     });
 
-    function loadVisiteurs() {
-        fetch('http://localhost:9090/api/v1/visiteurs/getAllVisiteurs')
+    function loadOffres() {
+        fetch('http://localhost:9090/api/v1/offres/getAllOffres')
             .then(response => response.json())
             .then(data => {
-                const tableBody = document.getElementById('visiteurTableBody');
+                const tableBody = document.getElementById('offreTableBody');
                 tableBody.innerHTML = '';
-                data.forEach(visiteur => {
+                data.forEach(offre => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${visiteur.id_visiteur}</td>
-                        <td>${visiteur.nom_visiteur}</td>
-                        <td>${visiteur.prenom_visiteur}</td>
-                        <td>${visiteur.email_visiteur}</td>
-                        <td>${visiteur.solde_visiteur}</td>
+                        <td>${offre.id_offre}</td>
+                        <td>${offre.nom_offre}</td>
+                        <td>${offre.description_offre}</td>
+                        <td>${offre.prix_offre}</td>
+                        <td>${offre.nombre_personnes}</td>
+                        <td>${offre.date_fin_offre}</td>
                         <td>
-                            <button class="btn btn-info btn-sm me-2" onclick="viewVisiteur(${visiteur.id_visiteur})">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-warning btn-sm me-2" onclick="editVisiteur(${visiteur.id_visiteur})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteVisiteur(${visiteur.id_visiteur})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
+                        <!-- Bouton pour Voir -->
+                        <button class="btn btn-info btn-sm me-2" onclick="showOffre(${offre.id_offre})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Bouton pour Modifier -->
+                        <button class="btn btn-warning btn-sm me-2" onclick="viewOffre(${offre.id_offre})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                        <!-- Bouton pour Supprimer -->
+                        <button class="btn btn-danger btn-sm" onclick="deleteOffre(${offre.id_offre})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
                     `;
                     tableBody.appendChild(row);
                 });
             });
     }
-
-    function viewVisiteur(id) {
-        fetch(`http://localhost:9090/api/v1/visiteurs/${id}`)
+    function showOffre(id) {
+        fetch(`http://localhost:9090/api/v1/offres/${id}`)
             .then(response => response.json())
-            .then(visiteur => {
-                document.getElementById('editVisiteurId').value = visiteur.id_visiteur;
-                document.getElementById('editNom').value = visiteur.nom_visiteur;
-                document.getElementById('editPrenom').value = visiteur.prenom_visiteur;
-                document.getElementById('editEmail').value = visiteur.email_visiteur;
-                document.getElementById('editSolde').value = visiteur.solde_visiteur;
+            .then(offre => {
+                // Remplir les champs du modal avec les détails de l'offre
+                document.getElementById('showNom').innerText = offre.nom_offre;
+                document.getElementById('showDescription').innerText = offre.description_offre;
+                document.getElementById('showPrix').innerText = offre.prix_offre;
+                document.getElementById('showNombrePersonnes').innerText = offre.nombre_personnes;
+                document.getElementById('showDateFin').innerText = offre.date_fin_offre;
 
-                const modal = new bootstrap.Modal(document.getElementById('visiteurModal'));
+                // Ouvrir le modal de show
+                const modal = new bootstrap.Modal(document.getElementById('showOffreModal'));
                 modal.show();
             })
-            .catch(error => console.error('Erreur:', error));
+            .catch(error => {
+                console.error('Erreur lors de l\'affichage des détails:', error);
+                alert('Une erreur est survenue lors de l\'affichage des détails.');
+            });
     }
+
+    function viewOffre(id) {
+        fetch(`http://localhost:9090/api/v1/offres/${id}`)
+            .then(response => response.json())
+            .then(offre => {
+                document.getElementById('editOffreId').value = offre.id_offre;
+                document.getElementById('editNom').value = offre.nom_offre;
+                document.getElementById('editDescription').value = offre.description_offre;
+                document.getElementById('editPrix').value = offre.prix_offre;
+                document.getElementById('editNombrePersonnes').value = offre.nombre_personnes;
+                document.getElementById('editDateFin').value = offre.date_fin_offre;
+
+                const modal = new bootstrap.Modal(document.getElementById('offreModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement de l\'offre à modifier:', error);
+                alert('Une erreur est survenue lors du chargement de l\'offre.');
+            });
+    }
+
 
     function saveChanges() {
-        const id = document.getElementById('editVisiteurId').value;
+        const id = document.getElementById('editOffreId').value;
         const nom = document.getElementById('editNom').value;
-        const prenom = document.getElementById('editPrenom').value;
-        const email = document.getElementById('editEmail').value;
-        const solde = document.getElementById('editSolde').value;
+        const description = document.getElementById('editDescription').value;
+        const prix = document.getElementById('editPrix').value;
+        const nombrePersonnes = document.getElementById('editNombrePersonnes').value;
+        const dateFin = document.getElementById('editDateFin').value;
 
-        fetch("http://localhost:9090/api/v1/visiteurs/updateVisiteur", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id_visiteur: id, nom_visiteur: nom, prenom_visiteur: prenom, email_visiteur: email, solde_visiteur: solde }),
+        fetch('http://localhost:9090/api/v1/offres/updateOffre', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id_offre: id,
+                nom_offre: nom,
+                description_offre: description,
+                prix_offre: prix,
+                nombre_personnes: nombrePersonnes,
+                date_fin_offre: dateFin
+            }),
         })
-        .then(() => loadVisiteurs())
-        .catch(error => console.error("Erreur:", error));
+        .then(response => response.json())
+        .then(() => {
+            loadOffres();
+        });
     }
 
-    function deleteVisiteur(id) {
-        fetch(`http://localhost:9090/api/v1/visiteurs/deleteVisiteur`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id_visiteur: id })
+    function deleteOffre(id) {
+        fetch('http://localhost:9090/api/v1/offres/deleteOffre', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_offre: id }),
+       
         })
-        .then(() => loadVisiteurs())
-        .catch(error => console.error("Erreur:", error));
+        .then(response => {
+            if (response.ok) {
+                alert('Offre supprimée avec succès.');
+                loadOffres(); // Actualise la liste des offres
+            } else {
+                alert('Erreur lors de la suppression de l\'offre.');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue. Veuillez réessayer.');
+        });
     }
-</script>
+    </script>
 </body>
-<footer class="footer-section">
-    <head th:insert="fragments/footerFragment :: footerFragment"></head>
-</footer>
 </html>

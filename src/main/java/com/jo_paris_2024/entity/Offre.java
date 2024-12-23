@@ -1,7 +1,7 @@
 package com.jo_paris_2024.entity;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +22,7 @@ public class Offre {
 	    private String description_offre;
 	    private BigDecimal prix_offre;
 	    private Long nombre_personnes;
-	    private Date date_fin_offre;
+	    private LocalDate date_fin_offre;
 
 	    // Constructeur sans arguments
 	    public Offre() {
@@ -30,7 +30,7 @@ public class Offre {
 	
 	 // Constructeur avec tous les arguments
 	    public Offre(Long id_offre, String nom_offre, String description_offre, 
-	                   BigDecimal prix_offre, Long nombre_personnes, Date date_fin_offre) {
+	                   BigDecimal prix_offre, Long nombre_personnes, LocalDate date_fin_offre) {
 	        this.id_offre = id_offre;
 	        this.nom_offre = nom_offre;
 	        this.description_offre = description_offre;
@@ -79,12 +79,12 @@ public class Offre {
 			this.nombre_personnes = nombre_personnes;
 		}
 
-		public Date getDate_fin_offre() {
-			return date_fin_offre;
+		public LocalDate getDate_fin_offre() {
+		    return date_fin_offre;
 		}
 
-		public void setDate_fin_offre(Date date_fin_offre) {
-			this.date_fin_offre = date_fin_offre;
+		public void setDate_fin_offre(LocalDate date_fin_offre) {
+		    this.date_fin_offre = date_fin_offre;
 		}
 
 	
