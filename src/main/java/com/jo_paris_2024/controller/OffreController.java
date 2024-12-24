@@ -1,6 +1,9 @@
 package com.jo_paris_2024.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jo_paris_2024.dto.OffreDTO;
+import com.jo_paris_2024.entity.Offre;
+import com.jo_paris_2024.repository.OffreRepository;
 import com.jo_paris_2024.service.OffreService;
 
 @RestController
@@ -23,7 +28,9 @@ public class OffreController {
 
 	    @Autowired
 	    private OffreService offreService;
-
+	    @Autowired
+	    private OffreRepository offreRepository;
+	    
 	    @GetMapping("/{id_offre}")
 	    public OffreDTO getOffre(@PathVariable Long id_offre) {
 	        return offreService.getOffre(id_offre);
@@ -48,4 +55,18 @@ public class OffreController {
 	    public boolean deleteOffre(@RequestBody OffreDTO offreDTO) {
 	        return offreService.deleteOffre(offreDTO);
 	    }
+	    @GetMapping("/getAllIdsAndNames")
+	    public List<Map<String, Object>> getAllIdsAndNames() {
+	        return offreRepository.findAll()
+	                .stream()
+	                .map(offre -> {
+	                    Map<String, Object> map = new HashMap<>();
+	                    map.put("id_offre", offre.getId_offre());
+	                    map.put("nom_offre", offre.getNom_offre());
+	                    return map;
+	                })
+	                .collect(Collectors.toList());
+	    }
+
+
 	}

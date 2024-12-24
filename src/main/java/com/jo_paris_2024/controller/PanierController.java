@@ -29,8 +29,8 @@ public class PanierController {
 
     // Ajouter un panier
     @PostMapping("/savePanier")
-    public PanierDTO savePanier(@RequestBody PanierDTO panierDTO) {
-        return panierService.savePanier(panierDTO);
+    public List<PanierDTO> savePanier(@RequestBody List<PanierDTO> panierDTOs) {
+        return panierService.savePanier(panierDTOs);
     }
 
     // Mettre à jour un panier

@@ -4,139 +4,148 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Gestion des Billets</h1>
+<div class="container mt-4">
+    <h1 class="text-center">Gestion des Billets</h1>
 
-        <!-- Bouton pour ouvrir la modale d'ajout -->
-        <div class="text-start mb-3">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBilletModal">
-                <i class="fas fa-plus"></i> Ajouter un Billet
-            </button>
+    <!-- Formulaire d'ajout de billet -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Ajouter un Billet</h5>
+            <form id="addBilletForm">
+                <div class="mb-3">
+				    <label for="idOffre" class="form-label">Nom Offre</label>
+				    <select class="form-control" id="idOffre" required>
+				        <option value="" disabled selected>-- Sélectionner une Offre --</option>
+				    </select>
+				</div>
+                <div class="mb-3">
+                    <label for="typeBillet" class="form-label">Type de Billet</label>
+                    <input type="text" class="form-control" id="typeBillet" required>
+                </div>
+                <div class="mb-3">
+                    <label for="prixBillet" class="form-label">Prix du Billet</label>
+                    <input type="number" class="form-control" id="prixBillet" required>
+                </div>
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stock</label>
+                    <input type="number" class="form-control" id="stock" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
         </div>
+    </div>
 
-        <!-- Tableau des billets -->
-        <table class="table table-striped">
+    <!-- Tableau des billets -->
+    <div class="mt-4">
+        <h3>Liste des Billets</h3>
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nom</th>
+                    <th>ID Offre</th>
                     <th>Type</th>
                     <th>Prix</th>
-                    <th>Date d'Émission</th>
+                    <th>Stock</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="billetTableBody">
-                <!-- Les billets seront insérés dynamiquement -->
-            </tbody>
+            <tbody id="billetTableBody"></tbody>
         </table>
     </div>
+</div>
 
-    <!-- Modale d'ajout d'un billet -->
-    <div class="modal fade" id="addBilletModal" tabindex="-1" aria-labelledby="addBilletModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="billetForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addBilletModalLabel">Ajouter un Billet</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Nom -->
-                        <div class="mb-3">
-                            <label for="nom" class="form-label">Nom du Billet</label>
-                            <input type="text" class="form-control" id="nom" required>
-                        </div>
-                        <!-- Type -->
-                        <div class="mb-3">
-                            <label for="type" class="form-label">Type</label>
-                            <select class="form-select" id="type" required>
-                                <option value="">Sélectionner un type</option>
-                                <option value="Standard">Standard</option>
-                                <option value="VIP">VIP</option>
-                            </select>
-                        </div>
-                        <!-- Prix -->
-                        <div class="mb-3">
-                            <label for="prix" class="form-label">Prix</label>
-                            <input type="number" class="form-control" id="prix" required>
-                        </div>
-                        <!-- Date d'Émission -->
-                        <div class="mb-3">
-                            <label for="dateEmission" class="form-label">Date d'Émission</label>
-                            <input type="date" class="form-control" id="dateEmission" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Ajouter Billet</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const API_URL = "http://localhost:9090/api/v1/billets";
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadBillets();
-
-            // Gestion du formulaire d'ajout
-            document.getElementById('billetForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const nom = document.getElementById('nom').value;
-                const type = document.getElementById('type').value;
-                const prix = document.getElementById('prix').value;
-                const dateEmission = document.getElementById('dateEmission').value;
-
-                fetch("http://localhost:9090/api/v1/billets/saveBillet", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        nom_billet: nom,
-                        type_billet: type,
-                        prix_billet: prix,
-                        date_emission: dateEmission
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    loadBillets();
-                })
-                .catch(error => console.error("Erreur:", error));
-            });
-        });
-
-        function loadBillets() {
-            fetch('http://localhost:9090/api/v1/billets/getAllBillets')
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById('billetTableBody');
-                    tableBody.innerHTML = '';
-                    data.forEach(billet => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${billet.id_billet}</td>
-                            <td>${billet.nom_billet}</td>
-                            <td>${billet.type_billet}</td>
-                            <td>${billet.prix_billet}</td>
-                            <td>${billet.date_emission}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm me-2">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+    // Charger les billets
+    function loadBillets() {
+        axios.get(`${API_URL}/getAllBillets`)
+            .then(response => {
+                const billets = response.data;
+                const tableBody = document.getElementById('billetTableBody');
+                tableBody.innerHTML = '';
+                billets.forEach(billet => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${billet.id_billet}</td>
+                        <td>${billet.id_offre}</td>
+                        <td>${billet.type_billet}</td>
+                        <td>${billet.prix_billet}</td>
+                        <td>${billet.stock}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editBillet(${billet.id_billet})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteBillet(${billet.id_billet})">Supprimer</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
                 });
-        }
-    </script>
-</body>
-</html>
+            })
+            .catch(error => console.error('Erreur lors du chargement des billets:', error));
+    }
+
+    // Ajouter un billet
+    document.getElementById('addBilletForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const billet = {
+            id_offre: document.getElementById('idOffre').value,
+            type_billet: document.getElementById('typeBillet').value,
+            prix_billet: document.getElementById('prixBillet').value,
+            stock: document.getElementById('stock').value
+        };
+
+        axios.post(`${API_URL}/saveBillet`, billet)
+            .then(() => {
+                alert('Billet ajouté avec succès');
+                loadBillets();
+                document.getElementById('addBilletForm').reset();
+            })
+            .catch(error => console.error('Erreur lors de l\'ajout du billet:', error));
+    });
+
+    // Supprimer un billet
+    function deleteBillet(id) {
+        axios.delete(`${API_URL}/delete/${id}`)
+            .then(() => {
+                alert('Billet supprimé avec succès');
+                loadBillets();
+            })
+            .catch(error => console.error('Erreur lors de la suppression du billet:', error));
+    }
+
+    // Modifier un billet (À implémenter avec un modal)
+    function editBillet(id) {
+        // Exemple simplifié, vous pouvez ajouter un modal ici pour modifier le billet
+        alert(`Modifier le billet avec l'ID ${id}`);
+    }
+
+    // Charger les billets au démarrage
+    loadBillets();
+</script>
+<script>
+    const API_OFFRES_URL = "http://localhost:9090/api/v1/offres";
+
+    // Charger les ID et noms des offres dans la liste déroulante
+    function loadOffres() {
+        axios.get(`${API_OFFRES_URL}/getAllIdsAndNames`)
+            .then(response => {
+                const idOffreSelect = document.getElementById('idOffre');
+                response.data.forEach(offre => {
+                    const option = document.createElement('option');
+                    option.value = offre.id_offre; // ID comme valeur
+                    option.textContent = offre.nom_offre; // Nom affiché
+                    idOffreSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erreur lors du chargement des offres:', error));
+    }
+
+    // Charger les offres au démarrage
+    loadOffres();
+</script>
+
+<footer class="footer-section">
+       <head th:insert="fragments/footerFragment :: footerFragment"></head>
+       
+     
+    </footer>

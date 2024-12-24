@@ -54,4 +54,8 @@ public class PageController {
     public String connexionBilletPage() {
         return "billet"; // Renvoie le fichier offre.html
     }
+    @GetMapping("/achat") // Page des offres
+    public String connexionAchatBilletPage() {
+        return "achat_billet"; // Renvoie le fichier offre.html
+    }
 }

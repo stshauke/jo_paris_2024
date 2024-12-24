@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jo_paris_2024.dto.OffreDTO;
-
+import com.jo_paris_2024.dto.StadeDTO;
 import com.jo_paris_2024.entity.Offre;
-
+import com.jo_paris_2024.entity.Stade;
 import com.jo_paris_2024.repository.OffreRepository;
 
 import jakarta.transaction.Transactional;

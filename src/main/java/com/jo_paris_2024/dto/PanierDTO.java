@@ -16,23 +16,25 @@ public class PanierDTO {
     // Identifiant du billet
     private Integer idBillet;
 
-    // Quantité de billets dans le panier
-    private Integer quantite;
+    // Identifiant unique du billet acheté
+    private String identifiantBillet;
 
     // Date d'ajout du billet au panier
     private LocalDateTime dateAjout;
 
     // Constructeur sans arguments
     public PanierDTO() {
+        // Initialisation de la date à l'heure actuelle si aucune valeur n'est fournie
+        this.dateAjout = LocalDateTime.now();
     }
 
     // Constructeur avec arguments
-    public PanierDTO(Integer idPanier, Integer idVisiteur, Integer idBillet, Integer quantite, LocalDateTime dateAjout) {
+    public PanierDTO(Integer idPanier, Integer idVisiteur, Integer idBillet, String identifiantBillet, LocalDateTime dateAjout) {
         this.idPanier = idPanier;
         this.idVisiteur = idVisiteur;
         this.idBillet = idBillet;
-        this.quantite = quantite;
-        this.dateAjout = dateAjout;
+        this.identifiantBillet = identifiantBillet;
+        this.dateAjout = dateAjout != null ? dateAjout : LocalDateTime.now(); // Si la date est nulle, on utilise l'heure actuelle
     }
 
     // Getters et Setters
@@ -61,16 +63,12 @@ public class PanierDTO {
         this.idBillet = idBillet;
     }
 
-    public Integer getQuantite() {
-        return quantite;
+    public String getIdentifiantBillet() {
+        return identifiantBillet;
     }
 
-    public void setQuantite(Integer quantite) {
-        if (quantite != null && quantite > 0) {
-            this.quantite = quantite;
-        } else {
-            throw new IllegalArgumentException("La quantité doit être supérieure à zéro.");
-        }
+    public void setIdentifiantBillet(String identifiantBillet) {
+        this.identifiantBillet = identifiantBillet;
     }
 
     public LocalDateTime getDateAjout() {
@@ -78,7 +76,11 @@ public class PanierDTO {
     }
 
     public void setDateAjout(LocalDateTime dateAjout) {
-        this.dateAjout = dateAjout;
+        if (dateAjout != null) {
+            this.dateAjout = dateAjout;
+        } else {
+            throw new IllegalArgumentException("La date d'ajout ne peut pas être nulle.");
+        }
     }
 
     // Méthode toString
@@ -88,7 +90,7 @@ public class PanierDTO {
                 "idPanier=" + idPanier +
                 ", idVisiteur=" + idVisiteur +
                 ", idBillet=" + idBillet +
-                ", quantite=" + quantite +
+                ", identifiantBillet='" + identifiantBillet + '\'' +
                 ", dateAjout=" + dateAjout +
                 '}';
     }
