@@ -22,17 +22,21 @@ public class Panier {
     private String identifiant_billet;  // Identifiant unique pour chaque billet acheté
 
     private LocalDateTime date_ajout;
+    
+    private String cle_unique; //clé unique pour chaque billet acheté
 
     // Constructeur par défaut
     public Panier() {}
 
     // Constructeur avec arguments
-    public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, String identifiant_billet, LocalDateTime date_ajout) {
+    public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
+    		String identifiant_billet, LocalDateTime date_ajout, String cle_unique) {
     	this.id_panier = id_panier;
     	this.id_visiteur = id_visiteur;
         this.id_billet = id_billet;
         this.identifiant_billet = identifiant_billet;
         this.date_ajout = date_ajout;
+        this.cle_unique = cle_unique;
     }
 
     // Getters et Setters
@@ -60,13 +64,23 @@ public class Panier {
         this.id_billet = id_billet;
     }
 
-    public String getIdentifiant_billet() {
+    public String getCle_unique() {
+        return cle_unique;
+    }
+
+    public void setCle_unique(String cle_unique) {
+        this.cle_unique = cle_unique;
+    }
+    
+     public String getIdentifiant_billet() {
         return identifiant_billet;
     }
 
     public void setIdentifiant_billet(String identifiant_billet) {
         this.identifiant_billet = identifiant_billet;
     }
+    
+    
 
     public LocalDateTime getDate_ajout() {
         return date_ajout;

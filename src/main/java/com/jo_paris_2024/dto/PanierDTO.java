@@ -18,10 +18,13 @@ public class PanierDTO {
 
     // Identifiant unique du billet acheté
     private String identifiantBillet;
+    
+    // Identifiant unique du qr code
+    private String cleUnique;
 
     // Date d'ajout du billet au panier
     private LocalDateTime dateAjout;
-
+    
     // Constructeur sans arguments
     public PanierDTO() {
         // Initialisation de la date à l'heure actuelle si aucune valeur n'est fournie
@@ -29,12 +32,14 @@ public class PanierDTO {
     }
 
     // Constructeur avec arguments
-    public PanierDTO(Integer idPanier, Integer idVisiteur, Integer idBillet, String identifiantBillet, LocalDateTime dateAjout) {
+    public PanierDTO(Integer idPanier, Integer idVisiteur, Integer idBillet, String identifiantBillet, 
+    		LocalDateTime dateAjout,String cleUnique) {
         this.idPanier = idPanier;
         this.idVisiteur = idVisiteur;
         this.idBillet = idBillet;
         this.identifiantBillet = identifiantBillet;
         this.dateAjout = dateAjout != null ? dateAjout : LocalDateTime.now(); // Si la date est nulle, on utilise l'heure actuelle
+        this.cleUnique=cleUnique;
     }
 
     // Getters et Setters
@@ -70,6 +75,14 @@ public class PanierDTO {
     public void setIdentifiantBillet(String identifiantBillet) {
         this.identifiantBillet = identifiantBillet;
     }
+    public String getCleUnique() {
+        return cleUnique;
+    }
+
+    public void setCleUnique(String cleUnique) {
+        this.cleUnique = cleUnique;
+    }
+    
 
     public LocalDateTime getDateAjout() {
         return dateAjout;
@@ -92,6 +105,7 @@ public class PanierDTO {
                 ", idBillet=" + idBillet +
                 ", identifiantBillet='" + identifiantBillet + '\'' +
                 ", dateAjout=" + dateAjout +
+                 ", cleUnique='" + cleUnique + '\'' +
                 '}';
     }
 }

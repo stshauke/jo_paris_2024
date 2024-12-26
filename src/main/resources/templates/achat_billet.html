@@ -165,6 +165,8 @@
                 // Vous pouvez ici vider le panier ou afficher un message de confirmation
                 panier = [];
                 afficherPanier();
+                //Rafraîchir la liste des billets pour afficher le stock mis à jour
+                loadBillets();
             })
             .catch(error => {
                 console.error('Erreur lors de l\'ajout du panier:', error);
