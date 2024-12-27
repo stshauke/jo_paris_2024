@@ -1,0 +1,95 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="fragments/headerFragment :: headerFragment"></head>
+
+<body>
+<div class="container d-flex flex-column align-items-center vh-100 mt-4 ">
+    <!-- Barre de recherche -->
+    <div class="d-flex justify-content-center align-items-center w-75 mb-4">
+        <input type="text" id="inputIdPanier" class="form-control me-2" style="max-width: 300px;" placeholder="Entrez l'ID du panier">
+        <button id="btnRechercher" class="btn btn-primary">Rechercher</button>
+    </div>
+
+    <!-- Message d'alerte -->
+    <div id="alertMessage" class="alert alert-danger w-75 d-none">
+        Le panier est introuvable ou l'ID est invalide.
+    </div>
+
+    <!-- Carte du panier -->
+    <div id="cartePanier" class="w-75 d-none">
+        <div class="row align-items-center border p-4 shadow-sm">
+            <!-- Colonne gauche : QR Code et texte -->
+            <div class="col-md-6 text-center">
+                <h5 class="mb-3">lights tour</h5>
+                <div id="qrCodeContainer">
+                    <!-- L'image QR Code sera injectée ici par JavaScript -->
+                </div>
+                <p class="mt-2 text-muted">Scannez et obtenez une réduction sur votre prochain entrée</p>
+            </div>
+            
+            <!-- Colonne droite : Informations -->
+            <div class="col-md-6">
+                <p><strong>N° : </strong> <span id="numero"></span></p>
+                <p><strong>Prénom & Nom : </strong> <span id="nomPrenom"></span></p>
+                <p><strong>Siège : </strong> <span id="siege"></span></p>
+                <p><strong>Class : </strong> <span id="type_billet"></span></p>
+                <p><strong>Date - Temps : </strong> <span id="date_formatee"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('btnRechercher').addEventListener('click', () => {
+        const panierId = document.getElementById('inputIdPanier').value;
+
+        if (!panierId) {
+            // Affiche l'alerte si l'ID est vide
+            document.getElementById('alertMessage').classList.remove('d-none');
+            document.getElementById('cartePanier').classList.add('d-none');
+            return;
+        }
+
+        // Faire une requête pour obtenir les informations du panier
+        fetch(`/api/v1/paniers/${panierId}/qr-code`)
+            .then(response => {
+                if (!response.ok) throw new Error('Panier non trouvé');
+                return response.json();
+            })
+            .then(data => {
+                // Masquer l'alerte et afficher la carte
+                document.getElementById('alertMessage').classList.add('d-none');
+                document.getElementById('cartePanier').classList.remove('d-none');
+
+                // Afficher l'image QR Code
+                const qrCodeContainer = document.getElementById('qrCodeContainer');
+                qrCodeContainer.innerHTML = ''; // Réinitialiser le contenu
+                const imgElement = document.createElement('img');
+                imgElement.src = 'data:image/png;base64,' + data.qrCodeImage;
+                imgElement.alt = "QR Code";
+                imgElement.width = 200;
+                imgElement.height = 200;
+                qrCodeContainer.appendChild(imgElement);
+
+                // Afficher les informations du panier
+                document.getElementById('nomPrenom').textContent = data.nomPrenom || 'N/A';
+                document.getElementById('numero').textContent = data.numero || 'N/A';
+                document.getElementById('siege').textContent = data.siege || 'N/A';
+                document.getElementById('type_billet').textContent = data.type_billet || 'N/A';
+                document.getElementById('date_formatee').textContent = data.date_formatee || 'N/A';
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des informations du panier', error);
+
+                // Affiche l'alerte en cas d'erreur
+                document.getElementById('alertMessage').classList.remove('d-none');
+                document.getElementById('cartePanier').classList.add('d-none');
+            });
+    });
+</script>
+
+<footer class="footer-section">
+    <head th:insert="fragments/footerFragment :: footerFragment"></head>
+</footer>
+</body>
+</html>

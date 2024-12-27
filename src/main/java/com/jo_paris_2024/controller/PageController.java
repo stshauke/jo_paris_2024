@@ -58,4 +58,8 @@ public class PageController {
     public String connexionAchatBilletPage() {
         return "achat_billet"; // Renvoie le fichier offre.html
     }
+    @GetMapping("/qr_code") // Page des offres
+    public String showQRCodePage() {
+        return "qr_code"; // Renvoie le fichier offre.html
+    }
 }

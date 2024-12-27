@@ -25,6 +25,9 @@ public class PanierDTO {
     // Date d'ajout du billet au panier
     private LocalDateTime dateAjout;
     
+    //Image du QR code (en binaire)
+    private byte[] qrCodeImage;
+    
     // Constructeur sans arguments
     public PanierDTO() {
         // Initialisation de la date à l'heure actuelle si aucune valeur n'est fournie
@@ -33,13 +36,14 @@ public class PanierDTO {
 
     // Constructeur avec arguments
     public PanierDTO(Integer idPanier, Integer idVisiteur, Integer idBillet, String identifiantBillet, 
-    		LocalDateTime dateAjout,String cleUnique) {
+    		LocalDateTime dateAjout,String cleUnique, byte[] qrCodeImage) {
         this.idPanier = idPanier;
         this.idVisiteur = idVisiteur;
         this.idBillet = idBillet;
         this.identifiantBillet = identifiantBillet;
         this.dateAjout = dateAjout != null ? dateAjout : LocalDateTime.now(); // Si la date est nulle, on utilise l'heure actuelle
         this.cleUnique=cleUnique;
+        this.qrCodeImage=qrCodeImage;
     }
 
     // Getters et Setters
@@ -96,6 +100,13 @@ public class PanierDTO {
         }
     }
 
+    
+    public byte[] getQrCodeImage() {
+    	return qrCodeImage;
+    }
+    public void setQr_code_image(byte[] qrCodeImage) {
+    	this.qrCodeImage=qrCodeImage;
+    }
     // Méthode toString
     @Override
     public String toString() {
@@ -106,6 +117,7 @@ public class PanierDTO {
                 ", identifiantBillet='" + identifiantBillet + '\'' +
                 ", dateAjout=" + dateAjout +
                  ", cleUnique='" + cleUnique + '\'' +
+                 ", qrCodeImage="+(qrCodeImage != null ? "image binaire" :"null")+
                 '}';
     }
 }

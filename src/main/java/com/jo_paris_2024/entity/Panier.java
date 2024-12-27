@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,19 +26,25 @@ public class Panier {
     private LocalDateTime date_ajout;
     
     private String cle_unique; //clé unique pour chaque billet acheté
+    
+    //Cest le type blob dans la base de données pour enregistrer des images dans la base
+    @Lob
+    @Column(name="qr_code_image")
+    private byte[] qr_code_image;
 
     // Constructeur par défaut
     public Panier() {}
 
     // Constructeur avec arguments
     public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
-    		String identifiant_billet, LocalDateTime date_ajout, String cle_unique) {
+    		String identifiant_billet, LocalDateTime date_ajout, String cle_unique, byte[] qrCodeImage) {
     	this.id_panier = id_panier;
     	this.id_visiteur = id_visiteur;
         this.id_billet = id_billet;
         this.identifiant_billet = identifiant_billet;
         this.date_ajout = date_ajout;
         this.cle_unique = cle_unique;
+        this.qr_code_image = qr_code_image;
     }
 
     // Getters et Setters
@@ -88,5 +96,11 @@ public class Panier {
 
     public void setDate_ajout(LocalDateTime date_ajout) {
         this.date_ajout = date_ajout;
+    }
+    public byte[] getQr_code_image() {
+    	return qr_code_image;
+    }
+    public void setQr_code_image(byte[] qr_code_image) {
+    	this.qr_code_image=qr_code_image;
     }
 }

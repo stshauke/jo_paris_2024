@@ -7,6 +7,7 @@ import com.jo_paris_2024.entity.Visiteur;
 import com.jo_paris_2024.repository.BilletRepository;
 import com.jo_paris_2024.repository.PanierRepository;
 import com.jo_paris_2024.repository.VisiteurRepository;
+import com.jo_paris_2024.utils.QRCodeGenerator;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -51,8 +52,8 @@ public class PanierService {
         // Assigner la clé générée au DTO en utilisant le setter
         panierDTO.setIdentifiantBillet(cleBillet);  // Utiliser le setter pour l'attribuer
         //Récupérer la clé attribuée au visiteur lors de son inscription
-        //Integer visiteurId=panierDTO.getIdVisiteur();
-        Integer visiteurId=12;
+        Integer visiteurId=panierDTO.getIdVisiteur();
+        //Integer visiteurId=12;
         //Recherche du visiteur par Id
         Visiteur visiteur=visiteurRepository.findById(Long.valueOf(visiteurId))
         		.orElseThrow(()->new EntityNotFoundException("Visiteur non trouvé pour l'Id :"+visiteurId));
@@ -65,6 +66,22 @@ public class PanierService {
         //Afficher ou vérifier la concaténation
         System.out.println("Clé Unique: "+cleUnique);
         
+        //Créer le qr code 
+        byte[] qrCodeBytes;
+        try {
+        	qrCodeBytes= QRCodeGenerator.generateQRCodeAsBytes(cleUnique, 200,200);
+        	//Vérifier si QR est bien généré
+        	if(qrCodeBytes==null|| qrCodeBytes.length==0) {
+        		throw new RuntimeException("Qr Code non généré ou vide.");
+        	}
+        	System.out.println("QR Code généré avec succès. Taille :"+ qrCodeBytes.length+ " KO");
+        }catch (Exception e) {
+        	throw new RuntimeException("Erreur lors de la génération du QR code.");
+        }
+        
+        
+        
+        
         // Créer une entité Panier à partir du DTO
         Panier panier = new Panier();
         panier.setId_visiteur(panierDTO.getIdVisiteur());
@@ -72,6 +89,7 @@ public class PanierService {
         panier.setIdentifiant_billet(panierDTO.getIdentifiantBillet());
         panier.setDate_ajout(panierDTO.getDateAjout());
           panier.setCle_unique(cleUnique);
+          panier.setQr_code_image(qrCodeBytes);
 
         // Sauvegarder l'entité dans la base de données
         Panier savedPanier = panierRepository.save(panier);
@@ -83,7 +101,8 @@ public class PanierService {
             savedPanier.getId_billet(),
             savedPanier.getIdentifiant_billet(),
             savedPanier.getDate_ajout(),
-             savedPanier.getCle_unique()
+             savedPanier.getCle_unique(),
+             savedPanier.getQr_code_image()
         );
     }
 
@@ -104,7 +123,8 @@ public class PanierService {
                         panier.getId_billet(),
                         panier.getIdentifiant_billet(),
                         panier.getDate_ajout(),
-                        panier.getCle_unique()
+                        panier.getCle_unique(),
+                        panier.getQr_code_image()
                 ))
                 .collect(Collectors.toList());
     }
@@ -119,7 +139,8 @@ public class PanierService {
                 panier.getId_billet(),
                 panier.getIdentifiant_billet(),
                 panier.getDate_ajout(),
-                panier.getCle_unique()
+                panier.getCle_unique(),
+                panier.getQr_code_image()
         );
     }
 
@@ -131,7 +152,8 @@ public class PanierService {
                 panierDTO.getIdBillet(),
                 panierDTO.getIdentifiantBillet(),
                 panierDTO.getDateAjout(),
-                panierDTO.getCleUnique()
+                panierDTO.getCleUnique(),
+                panierDTO.getQrCodeImage()
         );
         panierRepository.save(panier);
         return panierDTO;
@@ -145,7 +167,8 @@ public class PanierService {
                 panierDTO.getIdBillet(),
                 panierDTO.getIdentifiantBillet(),
                 panierDTO.getDateAjout(),
-                panierDTO.getCleUnique()
+                panierDTO.getCleUnique(),
+                panierDTO.getQrCodeImage()
                 
         );
         panierRepository.delete(panier);
