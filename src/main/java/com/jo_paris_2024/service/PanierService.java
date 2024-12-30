@@ -2,17 +2,18 @@ package com.jo_paris_2024.service;
 
 import com.jo_paris_2024.dto.PanierDTO;
 import com.jo_paris_2024.entity.Billet;
+import com.jo_paris_2024.entity.Offre;
 import com.jo_paris_2024.entity.Panier;
 import com.jo_paris_2024.entity.Visiteur;
 import com.jo_paris_2024.repository.BilletRepository;
 import com.jo_paris_2024.repository.PanierRepository;
 import com.jo_paris_2024.repository.VisiteurRepository;
 import com.jo_paris_2024.utils.QRCodeGenerator;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,12 @@ public class PanierService {
     private BilletRepository billetRepository;
     @Autowired
     private VisiteurRepository visiteurRepository;
+    @Autowired
+    private EmailService emailService;
     
     public PanierDTO savePanier(PanierDTO panierDTO) {
+    	// Créer une entité Panier à partir du DTO
+        Panier panier = new Panier();
     	//Vérifier si le billet existe dans la base de données
     	Optional<Billet> billetOptional =billetRepository.findById(Long.valueOf(panierDTO.getIdBillet()));
     	if(billetOptional.isEmpty()) {
@@ -78,12 +83,38 @@ public class PanierService {
         }catch (Exception e) {
         	throw new RuntimeException("Erreur lors de la génération du QR code.");
         }
+        //Récupérer l'offre associé au billet
+       // Offre offre = billet.getOffre();
+       // String nomOffre = offre.getNom_offre();
+
         
         
+        // Récupération des informations du visiteur pour l'e-mail
+        String emailVisiteur = visiteur.getEmail_visiteur(); // Assurez-vous que le champ email existe dans l'entité Visiteur
+        String nomPrenomVisiteur = visiteur.getNom_visiteur() + " " + visiteur.getPrenom_visiteur();
+        String subject = "Votre billet avec QR Code";
+        String body = String.format(
+            "Bonjour %s,\n\n" +
+            "Merci pour votre achat. Vous trouverez votre billet en pièce jointe sous forme de QR Code.\n\n" +
+            "Détails de votre billet :\n" +
+            "- Type de l'Offre : %s\n" +
+            "- Type de billet : %s\n" +
+            "- Numéro du billet : %s\n\n" +
+            "Cordialement,\nÉquipe Jo Paris 2024",
+            nomPrenomVisiteur,billet.getId_offre(), billet.getType_billet(), panier.getDate_ajout()
+        );
+
+        // Envoi de l'e-mail
+        try {
+            emailService.sendEmail(emailVisiteur, subject, body, qrCodeBytes);
+            System.out.println("E-mail envoyé avec succès à " + emailVisiteur);
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'envoi de l'e-mail : " + e.getMessage());
+        }
         
         
         // Créer une entité Panier à partir du DTO
-        Panier panier = new Panier();
+        //Panier panier = new Panier();
         panier.setId_visiteur(panierDTO.getIdVisiteur());
         panier.setId_billet(panierDTO.getIdBillet());
         panier.setIdentifiant_billet(panierDTO.getIdentifiantBillet());

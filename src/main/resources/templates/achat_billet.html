@@ -146,7 +146,7 @@
         function finaliserAchat() {
             // Préparez les données du panier avec id_billet correctement assigné
             const panierDTO = panier.map(billet => ({
-                idVisiteur: 1,  // L'id du visiteur, à remplacer par l'ID réel du visiteur
+                idVisiteur: 12,  // L'id du visiteur, à remplacer par l'ID réel du visiteur
                 idBillet: billet.id,  // Assurez-vous que l'ID du billet est bien transmis
                 dateAjout: new Date().toISOString()  // Utilisez la date actuelle
             }));
