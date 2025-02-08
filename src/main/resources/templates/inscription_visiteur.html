@@ -96,10 +96,11 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data); // Affiche la réponse complète dans la console
                     if (data.success) {
                         alert("Inscription réussie !");
                     } else {
-                        alert("Erreur lors de l'inscription : " + data.message);
+                        //alert("Erreur lors de l'inscription : " + data.message);
                     }
                 })
                 .catch(error => {

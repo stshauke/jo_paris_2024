@@ -93,6 +93,12 @@ public class VisiteurController {
                     .body(new ErrorResponse(e.getMessage()));
         }
     }
-
+    /**
+     * Récupère la clé_unique d'un visiteur par son ID.
+     */
+    @GetMapping("/{id_visiteur}/cle")
+    public String getCleVisiteurById(@PathVariable Long id_visiteur) {
+        return visiteurService.getCleVisiteurById(id_visiteur);
+    }
 
 }

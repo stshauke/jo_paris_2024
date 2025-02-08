@@ -132,5 +132,11 @@ public class VisiteurService {
         // Retourne le DTO sans exposer le mot de passe
         return mapToDTO(visiteur);
     }
+ // Récupère la clé unique d'un visiteur par son ID
+    public String getCleVisiteurById(Long visiteurId) {
+        Visiteur visiteur = visiteurRepository.findById(visiteurId)
+                .orElseThrow(() -> new RuntimeException("Visiteur introuvable avec l'ID : " + visiteurId));
+        return visiteur.getCle_visiteur(); // Retourne la clé unique
+    }
 
 }
