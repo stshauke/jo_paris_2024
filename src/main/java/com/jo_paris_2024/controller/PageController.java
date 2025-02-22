@@ -18,48 +18,58 @@ public class PageController {
 
     @GetMapping("/") // Page d'accueil
     public String indexPage(Model model) {
-        // Récupérer toutes les offres depuis le service
+        model.addAttribute("activePage", "home"); // Ajouter l'attribut "activePage" pour la page d'accueil
         List<OffreDTO> offres = offreService.getAllOffres();
-        // Ajouter les offres dans le modèle pour les utiliser dans index.html
         model.addAttribute("offres", offres);
-
         return "index"; // Renvoie le fichier index.html
     }
 
     @GetMapping("/stade") // Page du stade
-    public String stadePage() {
+    public String stadePage(Model model) {
+        model.addAttribute("activePage", "stade"); // Ajouter l'attribut "activePage" pour la page du stade
         return "stade"; // Renvoie le fichier stade.html
     }
 
-    @GetMapping("/visiteur") // Page du stade
-    public String visiteurPage() {
+    @GetMapping("/visiteur") // Page des visiteurs
+    public String visiteurPage(Model model) {
+        model.addAttribute("activePage", "visiteur"); // Ajouter l'attribut "activePage" pour la page des visiteurs
         return "visiteur"; // Renvoie le fichier visiteur.html
     }
 
     @GetMapping("/inscription") // Page d'inscription
-    public String inscription_visiteurPage() {
+    public String inscription_visiteurPage(Model model) {
+        model.addAttribute("activePage", "inscription"); // Ajouter l'attribut "activePage" pour la page d'inscription
         return "inscription_visiteur"; // Renvoie le fichier inscription_visiteur.html
     }
 
     @GetMapping("/connexion") // Page de connexion
-    public String connexionVisiteurPage() {
+    public String connexionVisiteurPage(Model model) {
+        model.addAttribute("activePage", "connexion"); // Ajouter l'attribut "activePage" pour la page de connexion
         return "connexion_visiteur"; // Renvoie le fichier connexion_visiteur.html
     }
 
-    @GetMapping("/offre") // Page des offres
-    public String connexionOffrePage() {
-        return "offre"; // Renvoie le fichier offre.html
+    @GetMapping("/offre")
+    public String offrePage(Model model) {
+        model.addAttribute("activePage", "Offres");
+        return "offre";
     }
-    @GetMapping("/billet") // Page des offres
-    public String connexionBilletPage() {
-        return "billet"; // Renvoie le fichier offre.html
+
+    @GetMapping("/billet")
+    public String billetPage(Model model) {
+        model.addAttribute("activePage", "Billets");
+        return "billet";
     }
-    @GetMapping("/achat") // Page des offres
-    public String connexionAchatBilletPage() {
-        return "achat_billet"; // Renvoie le fichier offre.html
+
+    @GetMapping("/achat")
+    public String achatBilletPage(Model model) {
+        model.addAttribute("activePage", "Achat");
+        return "achat_billet";
     }
-    @GetMapping("/qr_code") // Page des offres
-    public String showQRCodePage() {
-        return "qr_code"; // Renvoie le fichier offre.html
+
+    @GetMapping("/qr_code") // Page des QR codes
+    public String showQRCodePage(Model model) {
+        model.addAttribute("activePage", "qr_code"); // Ajouter l'attribut "activePage" pour la page QR Code
+        return "qr_code"; // Renvoie le fichier qr_code.html
     }
 }
+

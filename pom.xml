@@ -89,6 +89,7 @@
     <artifactId>jakarta.validation-api</artifactId>
     <version>3.0.2</version>
 </dependency>
+<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
 <dependency>
     <groupId>com.google.zxing</groupId>
     <artifactId>core</artifactId>
@@ -105,11 +106,6 @@
 </dependency>
 
 
-		<dependency>
-			<groupId>org.scrappynetwork.com</groupId>
-			<artifactId>API_REST</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>
