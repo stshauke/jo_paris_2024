@@ -158,6 +158,11 @@
         afficherPanier();
     }
 
+    
+    
+    
+    
+    
     function mockPaiement() {
         // Calculer le montant total du panier
         const montantTotal = panier.reduce((total, billet) => total + billet.prix, 0);
@@ -206,20 +211,37 @@
     }
 
     function finaliserAchat() {
-        // Préparez les données du panier pour l'API
-        const panierDTO = panier.map(billet => ({
-            idVisiteur: 12,  // L'id du visiteur
-            idBillet: billet.id,
-            dateAjout: new Date().toISOString()
-        }));
+        const emailVisiteur = localStorage.getItem("emailVisiteur"); // Récupérer l'email du localStorage
+        console.log("emailVisiteuremailVisiteuremailVisiteur:",emailVisiteur);
+        if (!emailVisiteur) {
+            alert("Utilisateur non authentifié.");
+            return;
+        }
 
-        // Envoi des données au backend via une requête POST
-        fetch('http://localhost:9090/api/v1/paniers/savePanier', {
-            method: 'POST',
+        // Étape 1 : Envoyer une requête pour obtenir l'idVisiteur à partir de l'emailVisiteur
+        fetch(`http://localhost:9090/api/v1/visiteurs/email/${emailVisiteur}`, {
+            method: "GET",
             headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(panierDTO)
+                "Content-Type": "application/json",
+            }
+        })
+        .then(response => response.json())
+        .then(idVisiteur => {
+            // Étape 2 : Préparer les données du panier avec l'idVisiteur récupéré
+            const panierDTO = panier.map(billet => ({
+                idVisiteur: idVisiteur, // Utiliser l'idVisiteur récupéré
+                idBillet: billet.id,
+                dateAjout: new Date().toISOString()
+            }));
+
+            // Étape 3 : Envoyer les données du panier au backend via une requête POST
+            return fetch('http://localhost:9090/api/v1/paniers/savePanier', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(panierDTO)
+            });
         })
         .then(response => response.json())
         .then(data => {

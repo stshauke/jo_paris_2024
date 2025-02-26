@@ -73,6 +73,7 @@
                 })
                 .then(data => {
                     alert("Connexion réussie !");
+                    localStorage.setItem("emailVisiteur", email); // Stocker l'email du visiteur dans le localStorage
                     window.location.href = "/"; // Redirection vers la page de tableau de bord
                 })
                 .catch(error => {
