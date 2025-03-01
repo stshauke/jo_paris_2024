@@ -4,11 +4,11 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Gestion des Offres</h1>
+        <h1 class="text-center mb-4" style="color:black;">Gestion des Offres</h1>
 
         <!-- Bouton pour ouvrir la modale d'ajout -->
-        <div class="text-start mb-3">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+        <div class="text-start mb-3" >
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal" id="btnAjoutOffre">
                 <i class="fas fa-plus"></i> Ajouter une Offre
             </button>
         </div>
@@ -23,7 +23,7 @@
                     <th>Prix</th>
                     <th>Nombre de Personnes</th>
                     <th>Date de Fin</th>
-                    <th>Actions</th>
+                     <th id="actionsHeader">Actions</th>
                 </tr>
             </thead>
             <tbody id="offreTableBody">
@@ -194,6 +194,7 @@
     });
 
     function loadOffres() {
+    	 let userEmail = localStorage.getItem('emailVisiteur');
         fetch('http://localhost:9090/api/v1/offres/getAllOffres')
             .then(response => response.json())
             .then(data => {
@@ -207,8 +208,11 @@
                         <td>${offre.description_offre}</td>
                         <td>${offre.prix_offre}</td>
                         <td>${offre.nombre_personnes}</td>
-                        <td>${offre.date_fin_offre}</td>
-                        <td>
+                        <td>${offre.date_fin_offre}</td>`;
+                        // Afficher les boutons seulement si l'email n'est pas 'tshaukemulumba@yahoo.com'
+    	                if (userEmail === 'tshaukemulumba@yahoo.com') {
+    	                    row.innerHTML += `
+    	                        <td>
                         <!-- Bouton pour Voir -->
                         <button class="btn btn-info btn-sm me-2" onclick="showOffre(${offre.id_offre})">
                             <i class="fas fa-eye"></i>
@@ -222,8 +226,9 @@
                         <button class="btn btn-danger btn-sm" onclick="deleteOffre(${offre.id_offre})">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                    </td>
-                    `;
+                        </td>`;
+    	                }
+
                     tableBody.appendChild(row);
                 });
             });
@@ -317,5 +322,26 @@
         });
     }
     </script>
+    <script>
+    // Attendre que le DOM soit complètement chargé avant d'exécuter le script
+    document.addEventListener('DOMContentLoaded', function () {
+        // Vérification de l'utilisateur dans le localStorage
+        let userEmail = localStorage.getItem('emailVisiteur');
+        
+       
+
+        // Si l'email n'est pas celui attendu, masquer le formulaire
+        if (userEmail !== 'tshaukemulumba@yahoo.com') {
+            document.getElementById('offreForm').style.display = 'none';
+            actionsHeader.style.display = 'none'; // Masquer l'en-tête de la colonne 'Actions'
+             document.getElementById('btnAjoutOffre').style.display = 'none';
+        } else {
+            // Afficher le formulaire si l'email correspond (optionnel, car le formulaire est affiché par défaut)
+            document.getElementById('offreForm').style.display = 'block';
+            actionsHeader.style.display = 'table-cell'; // Afficher la colonne 'Actions'
+           document.getElementById('btnAjoutOffre').style.display = 'block';
+}
+    });
+</script>
 </body>
 </html>

@@ -16,9 +16,10 @@
 </head>-->
 <body>
 <div class="container mt-5 d-flex justify-content-center align-items-center" style="flex-direction: column; height: 100%;">
-    <h1>Gestion des Stades</h1>
+    <h1 style="color:black;">Gestion des Stades</h1>
 
     <!-- Formulaire d'ajout de stade -->
+    
     <form id="stadeForm" class="mb-4">
         <div class="mb-3">
             <label for="name" class="form-label">Nom du Stade</label>
@@ -31,6 +32,8 @@
         <button type="submit" class="btn btn-primary">Ajouter Stade</button>
     </form>
 
+
+
     <!-- Table des stades -->
     <table class="table">
         <thead>
@@ -38,7 +41,7 @@
             <th>ID</th>
             <th>Nom</th>
             <th>Emplacement</th>
-            <th >Actions</th>
+            <th id="actionsHeader">Actions</th>
         </tr>
         </thead>
         <tbody id="stadeTableBody">
@@ -107,35 +110,50 @@
 	    });
 	});
 
-    function loadStades() {
-        fetch('http://localhost:9090/api/v1/stades/getAllStades')
-            .then(response => response.json())
-            .then(data => {
-                const tableBody = document.getElementById('stadeTableBody');
-                tableBody.innerHTML = '';
-				data.forEach(stade => {
-				    const row = document.createElement('tr');
-				    row.innerHTML = `
-				        <td>${stade.id_stade}</td>
-				        <td>${stade.nom_stade}</td>
-				        <td>${stade.adresse_stade}</td>
-				        <td>
-				            <button class="btn btn-info btn-sm me-2" onclick="viewStade(${stade.id_stade})">
-				                <i class="fas fa-eye"></i>
-				            </button>
-				            <button class="btn btn-warning btn-sm me-2" onclick="editStade(${stade.id_stade})">
-				                <i class="fas fa-edit"></i>
-				            </button>
-				            <button class="btn btn-danger btn-sm" onclick="deleteStade(${stade.id_stade})">
-				                <i class="fas fa-trash-alt"></i>
-				            </button>
-				        </td>
-				    `;
-				    tableBody.appendChild(row);
-				});
-            });
-			
-    }
+	function loadStades() {
+	    // Récupération de l'email de l'utilisateur
+	    const userEmail = localStorage.getItem('emailVisiteur');
+
+	    fetch('http://localhost:9090/api/v1/stades/getAllStades')
+	        .then(response => response.json())
+	        .then(data => {
+	            const tableBody = document.getElementById('stadeTableBody');
+	            tableBody.innerHTML = ''; // On vide le tableau avant de le remplir
+
+	            data.forEach(stade => {
+	                const row = document.createElement('tr');
+
+	                // Construction du contenu de la ligne
+	                row.innerHTML = `
+	                    <td>${stade.id_stade}</td>
+	                    <td>${stade.nom_stade}</td>
+	                    <td>${stade.adresse_stade}</td>`;
+
+	                // Afficher les boutons seulement si l'email n'est pas 'tshaukemulumba@yahoo.com'
+	                if (userEmail === 'tshaukemulumba@yahoo.com') {
+	                    row.innerHTML += `
+	                        <td>
+	                            <button class="btn btn-info btn-sm me-2" onclick="viewStade(${stade.id_stade})">
+	                                <i class="fas fa-eye"></i>
+	                            </button>
+	                            <button class="btn btn-warning btn-sm me-2" onclick="editStade(${stade.id_stade})">
+	                                <i class="fas fa-edit"></i>
+	                            </button>
+	                            <button class="btn btn-danger btn-sm" onclick="deleteStade(${stade.id_stade})">
+	                                <i class="fas fa-trash-alt"></i>
+	                            </button>
+	                        </td>`;
+	                }
+
+	                // Ajouter la ligne au tableau
+	                tableBody.appendChild(row);
+	            });
+	        })
+	        .catch(error => {
+	            console.error('Erreur lors du chargement des stades :', error);
+	        });
+	}
+
 
     function viewStade(stadeId) {
         fetch(`http://localhost:9090/api/v1/stades/${stadeId}`)
@@ -206,6 +224,27 @@
 	    .catch(error => console.error('Erreur lors de la suppression:', error));
 	}
 
+</script>
+<script>
+    // Attendre que le DOM soit complètement chargé avant d'exécuter le script
+    document.addEventListener('DOMContentLoaded', function () {
+        // Vérification de l'utilisateur dans le localStorage
+        let userEmail = localStorage.getItem('emailVisiteur');
+        
+       
+
+        // Si l'email n'est pas celui attendu, masquer le formulaire
+        if (userEmail !== 'tshaukemulumba@yahoo.com') {
+            document.getElementById('stadeForm').style.display = 'none';
+            actionsHeader.style.display = 'none'; // Masquer l'en-tête de la colonne 'Actions'
+
+        } else {
+            // Afficher le formulaire si l'email correspond (optionnel, car le formulaire est affiché par défaut)
+            document.getElementById('stadeForm').style.display = 'block';
+            actionsHeader.style.display = 'table-cell'; // Afficher la colonne 'Actions'
+
+        }
+    });
 </script>
 
 <footer class="footer-section">

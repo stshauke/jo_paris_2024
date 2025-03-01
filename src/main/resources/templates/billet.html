@@ -5,13 +5,13 @@
 </head>
 <body>
 <div class="container mt-4">
-    <h1 class="text-center">Gestion des Billets</h1>
+    <h1 class="text-center" style="color:black;font-weight:bold;">Gestion des Billets</h1>
 
     <!-- Formulaire d'ajout de billet -->
-    <div class="card mt-4">
+    <div class="card mt-4" id="addBilletForm">
         <div class="card-body">
             <h5 class="card-title">Ajouter un Billet</h5>
-            <form id="addBilletForm">
+            <form>
                 <div class="mb-3">
 				    <label for="idOffre" class="form-label">Nom Offre</label>
 				    <select class="form-control" id="idOffre" required>
@@ -46,7 +46,7 @@
                     <th>Type</th>
                     <th>Prix</th>
                     <th>Stock</th>
-                    <th>Actions</th>
+                    <th id="actionsHeader">Actions</th>
                 </tr>
             </thead>
             <tbody id="billetTableBody"></tbody>
@@ -60,6 +60,8 @@
 
     // Charger les billets
     function loadBillets() {
+    	 // Récupération de l'email de l'utilisateur
+	    const userEmail = localStorage.getItem('emailVisiteur');
         axios.get(`${API_URL}/getAllBillets`)
             .then(response => {
                 const billets = response.data;
@@ -72,12 +74,16 @@
                         <td>${billet.id_offre}</td>
                         <td>${billet.type_billet}</td>
                         <td>${billet.prix_billet}</td>
-                        <td>${billet.stock}</td>
-                        <td>
+                        <td>${billet.stock}</td>`;
+
+    	                // Afficher les boutons seulement si l'email n'est pas 'tshaukemulumba@yahoo.com'
+    	                if (userEmail === 'tshaukemulumba@yahoo.com') {
+    	                    row.innerHTML += `
+    	                        <td>
                             <button class="btn btn-warning btn-sm" onclick="editBillet(${billet.id_billet})">Modifier</button>
                             <button class="btn btn-danger btn-sm" onclick="deleteBillet(${billet.id_billet})">Supprimer</button>
-                        </td>
-                    `;
+                            </td>`;
+    	                }
                     tableBody.appendChild(row);
                 });
             })
@@ -143,7 +149,27 @@
     // Charger les offres au démarrage
     loadOffres();
 </script>
+<script>
+    // Attendre que le DOM soit complètement chargé avant d'exécuter le script
+    document.addEventListener('DOMContentLoaded', function () {
+        // Vérification de l'utilisateur dans le localStorage
+        let userEmail = localStorage.getItem('emailVisiteur');
+        
+       
 
+        // Si l'email n'est pas celui attendu, masquer le formulaire
+        if (userEmail !== 'tshaukemulumba@yahoo.com') {
+            document.getElementById('addBilletForm').style.display = 'none';
+            actionsHeader.style.display = 'none'; // Masquer l'en-tête de la colonne 'Actions'
+
+        } else {
+            // Afficher le formulaire si l'email correspond (optionnel, car le formulaire est affiché par défaut)
+            document.getElementById('addBilletForm').style.display = 'block';
+            actionsHeader.style.display = 'table-cell'; // Afficher la colonne 'Actions'
+
+        }
+    });
+</script>
 <footer class="footer-section">
        <head th:insert="fragments/footerFragment :: footerFragment"></head>
        
