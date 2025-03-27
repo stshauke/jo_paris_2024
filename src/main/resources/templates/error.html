@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+     <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <style>
+    /* --- Section d'erreur --- */
+.error-code {
+    font-size: 12rem;
+    font-weight: 900;
+    background: linear-gradient(to right, #0d6efd, #0dcaf0); /* Dégradé bleu pour l'erreur */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse 2s infinite;
+}
+
+.error-message {
+    color: rgba(255, 255, 255, 0.9); /* Texte en blanc avec un léger fondu */
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* --- Animation du texte --- */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* --- Style du bouton "Verre" (Glass Effect) --- */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px); /* Flou de fond */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-radius: 5px; /* Coins arrondis */
+    padding: 10px 20px;
+    text-transform: uppercase;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #0d6efd; /* Changer la couleur du texte au survol */
+    border-color: #0d6efd;
+}
+
+/* --- Ajustement du fond et de l'overlay --- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: url('/images/bg_3.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.error-container {
+    background: rgba(0, 0, 0, 0.6); /* Fond semi-transparent sombre pour la lisibilité */
+    padding: 40px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Titres d'erreur --- */
+.error-container h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.error-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.error-container p {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.error-container a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0d6efd;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.error-container a:hover {
+    background-color: #0dcaf0;
+}
+
+    </style>
+</head>
+<body>
+    
+    <div class="error-page d-flex align-items-center justify-content-center">
+    <div class="error-container text-center p-4">
+        <h1 class="error-code mb-0">404</h1>
+        <h2 class="display-6 error-message mb-3">Page non trouvée</h2>
+        <p class="lead error-message mb-5">Oops ! Une erreur est survenue.</p>
+         <p th:text="${message}">Erreur inconnue</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/" class="btn btn-glass px-4 py-2">Return Home</a>
+            <a href="#" class="btn btn-glass px-4 py-2">Report Problem</a>
+        </div>
+    </div>
+</div>
+<!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</body>
+</html>

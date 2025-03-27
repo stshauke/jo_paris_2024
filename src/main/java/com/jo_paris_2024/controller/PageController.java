@@ -3,16 +3,20 @@ package com.jo_paris_2024.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.jo_paris_2024.dto.OffreDTO;
+import com.jo_paris_2024.service.AuthService;
 import com.jo_paris_2024.service.OffreService;
 
 @Controller
 public class PageController {
-
+	 @Autowired
+	    private AuthService authService;  // Service pour valider le token
     @Autowired
     private OffreService offreService;
 
@@ -62,9 +66,22 @@ public class PageController {
 
     @GetMapping("/achat")
     public String achatBilletPage(Model model) {
+        // Récupérer le token depuis le contexte de sécurité
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String token = authentication != null ? authentication.getCredentials().toString() : null;
+        
+        // Récupérer l'email de l'utilisateur connecté
+        String email = authentication != null ? authentication.getName() : null;  // L'email est généralement stocké comme principal
+        
+        // Si le token ou l'email est absent ou si le token est invalide, rediriger vers la page de connexion
+        if (token == null || email == null || !authService.isTokenValid(token, email)) {
+            return "redirect:/connexion";  // Redirection vers la page de connexion si le token ou l'email est invalide
+        }
+
         model.addAttribute("activePage", "Achat");
-        return "achat_billet";
+        return "achat_billet";  // Renvoie le fichier achat_billet.html
     }
+
 
     @GetMapping("/qr_code") // Page des QR codes
     public String showQRCodePage(Model model) {

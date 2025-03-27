@@ -2,50 +2,48 @@ package com.jo_paris_2024.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.jo_paris_2024.security.jwt.JwtAuthFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
     }
-	
-	
-	
-	
-	
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .requestMatchers("/", "/api/v1/stades/**", "/api/v1/visiteurs/**").permitAll()
-
-                .anyRequest().authenticated() // Authentification requise pour les autres requêtes
-            .and()
-            .httpBasic() // Activer l'authentification Basic
-            .and()
-            .csrf().disable(); // Désactiver CSRF pour les appels API
-        return http.build();
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**", "/public/**").permitAll() // Permet l'accès aux pages publiques comme /auth (connexion, inscription)
+                        .requestMatchers("/achat/**").authenticated() // Bloque l'accès à /achat (nécessite un JWT)
+                        .anyRequest().permitAll() // Permet l'accès à toutes les autres pages sans authentification
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Ajouter le filtre JWT avant l'authentification classique
+                .exceptionHandling()
+                    .authenticationEntryPoint((request, response, authException) -> { // Personnaliser la réponse en cas de non-authentification
+                        response.sendError(401, "Accès non autorisé : Veuillez vous connecter.");
+                    })
+                .and()
+                .build();
     }
 
-    // Configurer un utilisateur en mémoire avec un mot de passe
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.builder()
-            .username("admin")
-            .password(passwordEncoder.encode("admin123")) // Hacher le mot de passe avec BCrypt
-            .roles("USER")
-            .build();
-        return new InMemoryUserDetailsManager(user);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

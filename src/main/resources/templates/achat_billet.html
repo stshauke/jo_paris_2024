@@ -43,224 +43,262 @@
             </tbody>
         </table>
 
+        <!-- Bouton Payer -->
+        <div class="text-end mt-3">
+            <button id="payer" class="btn btn-success" style="color: #fff;background-color: #28a745;border-color: #28a745;" disabled>Payer</button>
+        </div>
 
-
-<!-- Bouton Payer -->
-<div class="text-end mt-3">
-    <button id="payer" class="btn btn-success" style="color: #fff;background-color: #28a745;border-color: #28a745;" disabled>Payer</button>
-</div>
-
-<!-- Bouton Finaliser l'achat -->
-<div class="text-end">
-    <button id="finaliserAchat" class="btn btn-primary" style="color: #fff;background-color: #0d6efd;border-color: #0d6efd;" disabled>Finaliser l'Achat</button>
-</div>
-
+        <!-- Bouton Finaliser l'achat -->
+        <div class="text-end">
+            <button id="finaliserAchat" class="btn btn-primary" style="color: #fff;background-color: #0d6efd;border-color: #0d6efd;" disabled>Finaliser l'Achat</button>
+        </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    let panier = [];
+        let panier = [];
 
-    document.addEventListener('DOMContentLoaded', () => {
-        loadBillets();
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem("jwtToken");
 
-        // Écouter l'événement pour finaliser l'achat
-        document.getElementById('finaliserAchat').addEventListener('click', function () {
-            finaliserAchat();
+            if (!token) {
+                alert("Vous devez être connecté pour accéder à cette page.");
+                window.location.href = "/connexion";  // Redirige l'utilisateur vers la page de connexion
+                return;
+            }
+
+            // Vérification de la validité du token côté serveur
+            fetch('http://localhost:9090/api/v1/validateToken', {
+                method: 'POST',
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    alert("Le token est invalide ou a expiré. Veuillez vous reconnecter.");
+                    window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                }
+            })
+            .then(() => {
+                // Si le token est valide, charger les billets
+                loadBillets();
+            });
+
+            // Écouter l'événement pour finaliser l'achat
+            document.getElementById('finaliserAchat').addEventListener('click', function () {
+                finaliserAchat();
+            });
+
+            // Écouter l'événement pour effectuer le paiement
+            document.getElementById('payer').addEventListener('click', function () {
+                mockPaiement();
+            });
         });
 
-        // Écouter l'événement pour effectuer le paiement
-        document.getElementById('payer').addEventListener('click', function () {
-        	mockPaiement();
-        });
-    });
+        let offres = {};
 
-    let offres = {};
+        function loadBillets() {
+            const token = localStorage.getItem("jwtToken");
 
-    function loadBillets() {
-        // Récupérer la liste des offres (id_offre et nom_offre)
-        fetch('http://localhost:9090/api/v1/offres/getAllOffres')
-            .then(response => response.json())
+            fetch('http://localhost:9090/api/v1/offres/getAllOffres', {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token // Ajouter le token JWT
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        alert("Accès refusé. Veuillez vous connecter.");
+                        window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                    }
+                    throw new Error("Erreur de récupération des offres.");
+                }
+                return response.json();
+            })
             .then(data => {
-                // Mapper id_offre -> nom_offre
+                offres = {};
                 data.forEach(offre => {
                     offres[offre.id_offre] = offre.nom_offre;
                 });
 
-                // Récupérer la liste des billets
-                fetch('http://localhost:9090/api/v1/billets/getAllBillets')
-                    .then(response => response.json())
-                    .then(billets => {
-                        const tableBody = document.getElementById('billetTableBody');
-                        tableBody.innerHTML = '';
+                fetch('http://localhost:9090/api/v1/billets/getAllBillets', {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token // Ajouter le token JWT
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            alert("Accès refusé. Veuillez vous connecter.");
+                            window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                        }
+                        throw new Error("Erreur de récupération des billets.");
+                    }
+                    return response.json();
+                })
+                .then(billets => {
+                    const tableBody = document.getElementById('billetTableBody');
+                    tableBody.innerHTML = '';
 
-                        billets.forEach(billet => {
-                            // Obtenir nom_offre en fonction de id_offre
-                            const nomOffre = offres[billet.id_offre] || 'Inconnu';
-
-                            // Créer une ligne de tableau pour chaque billet
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${billet.id_billet}</td>
-                                <td>${nomOffre}</td>
-                                <td>${billet.type_billet}</td>
-                                <td>${billet.prix_billet}</td>
-                                <td>${billet.stock}</td>
-                                <td>
-                                    <button class="btn btn-success btn-sm" onclick="ajouterAuPanier(${billet.id_billet}, ${billet.id_offre}, '${billet.type_billet}', ${billet.prix_billet})">
-                                        <i class="fas fa-cart-plus"></i> Ajouter au Panier
-                                    </button>
-                                </td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des billets:', error));
+                    billets.forEach(billet => {
+                        const nomOffre = offres[billet.id_offre] || 'Inconnu';
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${billet.id_billet}</td>
+                            <td>${nomOffre}</td>
+                            <td>${billet.type_billet}</td>
+                            <td>${billet.prix_billet}</td>
+                            <td>${billet.stock}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="ajouterAuPanier(${billet.id_billet}, ${billet.id_offre}, '${billet.type_billet}', ${billet.prix_billet})">
+                                    <i class="fas fa-cart-plus"></i> Ajouter au Panier
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erreur lors du chargement des billets:', error));
             })
             .catch(error => console.error('Erreur lors du chargement des offres:', error));
-    }
-
-    function ajouterAuPanier(id, nomOffre, type, prix) {
-        // Ajoutez une nouvelle entrée dans le panier pour chaque billet sélectionné
-        panier.push({ id, nomOffre, type, prix });
-        // Afficher le panier mis à jour
-        afficherPanier();
-    }
-
-    function afficherPanier() {
-        const tableBody = document.getElementById('panierTableBody');
-        tableBody.innerHTML = '';
-        panier.forEach(billet => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${billet.id}</td>
-                <td>${billet.nomOffre}</td>
-                <td>${billet.type}</td>
-                <td>${billet.prix}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" onclick="retirerDuPanier(${billet.id})">
-                        <i class="fas fa-trash-alt"></i> Retirer
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Si le panier est vide, le bouton "Payer" est désactivé
-        document.getElementById('payer').disabled = panier.length === 0;
-        // Si le panier contient des éléments, le bouton "Payer" est visible
-        document.getElementById('payer').hidden = panier.length === 0;
-    }
-
-    function retirerDuPanier(id) {
-        panier = panier.filter(billet => billet.id !== id);
-        afficherPanier();
-    }
-
-    
-    
-    
-    
-    
-    function mockPaiement() {
-        // Calculer le montant total du panier
-        const montantTotal = panier.reduce((total, billet) => total + billet.prix, 0);
-
-        // Envoi de la requête de paiement
-        fetch('http://localhost:9090/api/v1/paiement/simuler', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                idVisiteur: 12,  // Remplace par l'ID réel du visiteur
-                montant: montantTotal  // Le montant total du panier
-            })
-        })
-        .then(response => {
-            // Vérification si la réponse est correcte
-            if (!response.ok) {
-                throw new Error('Erreur lors de la requête');
-            }
-            return response.json();  // Utiliser .json() pour obtenir la réponse sous forme d'objet
-        })
-        .then(data => {
-            console.log(data);  // Affiche la réponse pour voir le message JSON
-
-            if (data.message && data.message.includes("succès")) {
-                // Si le paiement a réussi, activer le bouton de finalisation
-                document.getElementById('finaliserAchat').disabled = false;
-                alert(`Paiement de ${montantTotal}€ effectué avec succès.`);  // Afficher le montant dans l'alerte
-            } else {
-                // Si le paiement a échoué, afficher un message d'erreur
-                alert("Le paiement a échoué : " + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur lors du paiement:', error);
-            alert("Une erreur est survenue lors du paiement.");
-        });
-    }
-
-
-
-    function calculerMontantPanier() {
-        // Calculer le montant total du panier
-        return panier.reduce((total, billet) => total + billet.prix, 0);
-    }
-
-    function finaliserAchat() {
-        const emailVisiteur = localStorage.getItem("emailVisiteur"); // Récupérer l'email du localStorage
-        console.log("emailVisiteuremailVisiteuremailVisiteur:",emailVisiteur);
-        if (!emailVisiteur) {
-            alert("Utilisateur non authentifié.");
-            return;
         }
 
-        // Étape 1 : Envoyer une requête pour obtenir l'idVisiteur à partir de l'emailVisiteur
-        fetch(`http://localhost:9090/api/v1/visiteurs/email/${emailVisiteur}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        })
-        .then(response => response.json())
-        .then(idVisiteur => {
-            // Étape 2 : Préparer les données du panier avec l'idVisiteur récupéré
-            const panierDTO = panier.map(billet => ({
-                idVisiteur: idVisiteur, // Utiliser l'idVisiteur récupéré
-                idBillet: billet.id,
-                dateAjout: new Date().toISOString()
-            }));
+        function ajouterAuPanier(id, nomOffre, type, prix) {
+            // Ajoutez une nouvelle entrée dans le panier pour chaque billet sélectionné
+            panier.push({ id, nomOffre, type, prix });
+            // Afficher le panier mis à jour
+            afficherPanier();
+        }
 
-            // Étape 3 : Envoyer les données du panier au backend via une requête POST
-            return fetch('http://localhost:9090/api/v1/paniers/savePanier', {
+        function afficherPanier() {
+            const tableBody = document.getElementById('panierTableBody');
+            tableBody.innerHTML = '';
+            panier.forEach(billet => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${billet.id}</td>
+                    <td>${billet.nomOffre}</td>
+                    <td>${billet.type}</td>
+                    <td>${billet.prix}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="retirerDuPanier(${billet.id})">
+                            <i class="fas fa-trash-alt"></i> Retirer
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Si le panier est vide, le bouton "Payer" est désactivé
+            document.getElementById('payer').disabled = panier.length === 0;
+            // Si le panier contient des éléments, le bouton "Payer" est visible
+            document.getElementById('payer').hidden = panier.length === 0;
+        }
+
+        function retirerDuPanier(id) {
+            panier = panier.filter(billet => billet.id !== id);
+            afficherPanier();
+        }
+
+        function mockPaiement() {
+            // Calculer le montant total du panier
+            const montantTotal = panier.reduce((total, billet) => total + billet.prix, 0);
+
+            // Envoi de la requête de paiement
+            fetch('http://localhost:9090/api/v1/paiement/simuler', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(panierDTO)
+                body: JSON.stringify({
+                    idVisiteur: 12,  // Remplace par l'ID réel du visiteur
+                    montant: montantTotal  // Le montant total du panier
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la requête');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);  // Affiche la réponse pour voir le message JSON
+
+                if (data.message && data.message.includes("succès")) {
+                    // Si le paiement a réussi, activer le bouton de finalisation
+                    document.getElementById('finaliserAchat').disabled = false;
+                    alert(`Paiement de ${montantTotal}€ effectué avec succès.`);  // Afficher le montant dans l'alerte
+                } else {
+                    // Si le paiement a échoué, afficher un message d'erreur
+                    alert("Le paiement a échoué : " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du paiement:', error);
+                alert("Une erreur est survenue lors du paiement.");
             });
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Panier ajouté avec succès:", data);
+        }
 
-            // Vider le panier et désactiver le bouton "Finaliser l'achat"
-            panier = [];
-            afficherPanier();
-            document.getElementById('finaliserAchat').disabled = true;
+        function finaliserAchat() {
+            const token = localStorage.getItem("jwtToken");
+            const emailVisiteur = localStorage.getItem("emailVisiteur");
 
-            // Rafraîchir la liste des billets pour afficher le stock mis à jour
-            loadBillets();
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'ajout du panier:', error);
-        });
-    }
+            if (!emailVisiteur || !token) {
+                alert("Utilisateur non authentifié. Veuillez vous connecter.");
+                return;
+            }
 
+            fetch(`http://localhost:9090/api/v1/visiteurs/email/${emailVisiteur}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token // Ajout du token
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    alert("Accès refusé. Veuillez vous reconnecter.");
+                    window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                }
+                return response.json();
+            })
+            .then(idVisiteur => {
+                const panierDTO = panier.map(billet => ({
+                    idVisiteur: idVisiteur,
+                    idBillet: billet.id,
+                    dateAjout: new Date().toISOString()
+                }));
 
+                return fetch('http://localhost:9090/api/v1/paniers/savePanier', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                       
+                        "Authorization": "Bearer " + token // Ajout du token
+                    },
+                    body: JSON.stringify(panierDTO)
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Panier ajouté avec succès:", data);
+                panier = [];
+                afficherPanier();
+                document.getElementById('finaliserAchat').disabled = true;
+                loadBillets(); // Recharger les billets après finalisation
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'ajout du panier:', error);
+                alert("Une erreur est survenue.");
+            });
+        }
     </script>
 </body>
 </html>
+                       
