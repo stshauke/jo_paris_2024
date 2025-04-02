@@ -29,13 +29,13 @@ public class AuthService {
         return jwtService.generateToken(email);
     }
 
-    // Méthode pour valider un token JWT
+ // Méthode pour valider un token JWT
     public boolean isTokenValid(String token, String email) {
         try {
-            // Utilise la méthode validateToken du JwtService pour valider le token
-            return jwtService.validateToken(token, email);  // Cette méthode a été ajoutée dans JwtService
+            return jwtService.isTokenValid(token, email); // Correction ici
         } catch (Exception e) {
-            return false;  // Si une exception est levée (par exemple, token invalide), retournez false
+            return false;  // En cas d'exception (token invalide), retourne false
         }
     }
+
 }

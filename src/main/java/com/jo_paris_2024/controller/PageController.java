@@ -8,13 +8,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.jo_paris_2024.dto.OffreDTO;
 import com.jo_paris_2024.service.AuthService;
+import com.jo_paris_2024.service.JwtService;
 import com.jo_paris_2024.service.OffreService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class PageController {
+    @Autowired
+    private JwtService jwtService; // Injecte JwtService
 	 @Autowired
 	    private AuthService authService;  // Service pour valider le token
     @Autowired
@@ -65,28 +72,44 @@ public class PageController {
     }
 
     @GetMapping("/achat")
-    public String achatBilletPage(Model model) {
-        // Récupérer le token depuis le contexte de sécurité
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = authentication != null ? authentication.getCredentials().toString() : null;
+    public String achatBilletPage(HttpServletRequest request, Model model) {
+        // 1. Essayer de récupérer le token depuis l'en-tête
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
         
-        // Récupérer l'email de l'utilisateur connecté
-        String email = authentication != null ? authentication.getName() : null;  // L'email est généralement stocké comme principal
-        
-        // Si le token ou l'email est absent ou si le token est invalide, rediriger vers la page de connexion
-        if (token == null || email == null || !authService.isTokenValid(token, email)) {
-            return "redirect:/connexion";  // Redirection vers la page de connexion si le token ou l'email est invalide
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            System.out.println("✅ Token trouvé dans l'en-tête: " + token.substring(0, 15) + "...");
         }
-
+        
+        // 2. Si pas dans l'en-tête, chercher dans les cookies
+        if (token == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("jwtToken".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        System.out.println("✅ Token trouvé dans les cookies: " + token.substring(0, 15) + "...");
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Si toujours aucun token, rediriger
+        if (token == null) {
+            System.out.println("❌ Aucun token trouvé, redirection...");
+            return "redirect:/connexion";
+        }
+        
+        // Valider le token
+        String email = jwtService.extractEmail(token);
+        if (email == null || !jwtService.isTokenValid(token, email)) {
+            System.out.println("⛔ Token invalide pour l'email: " + email);
+            return "redirect:/connexion";
+        }
+        
         model.addAttribute("activePage", "Achat");
-        return "achat_billet";  // Renvoie le fichier achat_billet.html
-    }
-
-
-    @GetMapping("/qr_code") // Page des QR codes
-    public String showQRCodePage(Model model) {
-        model.addAttribute("activePage", "qr_code"); // Ajouter l'attribut "activePage" pour la page QR Code
-        return "qr_code"; // Renvoie le fichier qr_code.html
+        return "achat_billet";
     }
 }
-

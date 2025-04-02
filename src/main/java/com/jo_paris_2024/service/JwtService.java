@@ -32,12 +32,16 @@ public class JwtService {
 
     // Méthode pour générer un token JWT
     public String generateToken(String email) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(email)
-                .setIssuedAt(new Date()) // Date d'émission
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expiration après 1h
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 120))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+        System.out.println("Token généré : " + token);
+        System.out.println("⏳ Expiration du token : " + extractClaim(token, Claims::getExpiration));
+
+        return token;
     }
 
     // Méthode pour vérifier la validité du token
@@ -47,6 +51,9 @@ public class JwtService {
 
     // Méthode pour vérifier si le token est expiré
     private boolean isTokenExpired(String token) {
+    	 Date expiration = extractClaim(token, Claims::getExpiration);
+    	    System.out.println("⏳ Expiration du token : " + expiration);
+    	    System.out.println("⏰ Heure actuelle : " + new Date());
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 

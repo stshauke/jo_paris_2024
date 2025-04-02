@@ -34,6 +34,7 @@
             </div>
         </form>
     </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -72,13 +73,31 @@
                 }
                 return response.json();
             })
-            .then(data => {
-                alert("Connexion réussie !");
-                localStorage.setItem("emailVisiteur", email); // Stocker l'email du visiteur dans le localStorage
-                localStorage.setItem("jwtToken", data.token); // Stocker le token JWT dans le localStorage
-                window.location.href = "/"; // Redirection vers la page de tableau de bord
-            })
-            .catch(error => {
+            
+            
+            
+            
+            
+			        .then(data => {
+			    console.log("Réponse complète :", data); // Vérifiez toute la réponse
+			
+			    const jwtToken = data.token; // Maintenant, "token" est bien retourné
+			
+			    if (jwtToken) {
+			        console.log("✅ Jeton reçu :", jwtToken);
+			        localStorage.setItem("jwtToken", jwtToken); // Stocke le jeton
+			        // Créer un cookie avec le token
+			        document.cookie = `jwtToken=${jwtToken}; path=/; max-age=86400; SameSite=Strict`;
+			    
+			    } else {
+			        console.error("❌ Jeton introuvable dans la réponse.");
+			    }
+			    console.warn("Votre email de connexion est :",email);
+			    alert("Connexion réussie !");
+			    localStorage.setItem("emailVisiteur",email); // Stocke l'email
+			    window.location.href = "/achat"; // Redirection
+			})
+				  .catch(error => {
                 console.error("Erreur:", error);
                 alert("Erreur de connexion : " + error.message);
             })
@@ -131,13 +150,10 @@
             });
         }
     });
-
-</script>
+    </script>
 
 <footer class="footer-section">
        <head th:insert="fragments/footerFragment :: footerFragment"></head>
-       
-     
-    </footer>
+</footer>
 </body>
 </html>

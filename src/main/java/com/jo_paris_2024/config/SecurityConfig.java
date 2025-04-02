@@ -10,13 +10,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.jo_paris_2024.security.jwt.JwtAuthFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final JwtAuthFilter jwtAuthFilter;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
@@ -29,16 +29,34 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/public/**").permitAll() // Permet l'accès aux pages publiques comme /auth (connexion, inscription)
-                        .requestMatchers("/achat/**").authenticated() // Bloque l'accès à /achat (nécessite un JWT)
-                        .anyRequest().permitAll() // Permet l'accès à toutes les autres pages sans authentification
+                        .requestMatchers("/auth/**", "/public/**", "/css/**", "/js/**", "/images/**", "/connexion").permitAll()
+                        .requestMatchers("/achat/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Ajouter le filtre JWT avant l'authentification classique
-                .exceptionHandling()
-                    .authenticationEntryPoint((request, response, authException) -> { // Personnaliser la réponse en cas de non-authentification
-                        response.sendError(401, "Accès non autorisé : Veuillez vous connecter.");
-                    })
-                .and()
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // Redirection vers la page de connexion au lieu d'une erreur 401
+                            if (request.getRequestURI().startsWith("/achat")) {
+                                response.sendRedirect("/connexion");
+                            } else {
+                                response.sendError(401, "Accès non autorisé : Veuillez vous connecter.");
+                            }
+                        })
+                )
+                .formLogin(form -> form
+                        .loginPage("/connexion")
+                        .permitAll()
+                        .defaultSuccessUrl("/", true)
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/deconnexion"))
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("jwtToken")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .permitAll()
+                )
                 .build();
     }
 
