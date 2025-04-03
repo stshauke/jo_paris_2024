@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Collections;
 
+/**
+ * Contrôleur responsable de l'authentification des visiteurs.
+ * Gère les connexions et la génération de tokens JWT.
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -18,34 +22,49 @@ public class AuthController {
     private final VisiteurService visiteurService;
     private final JwtService jwtService;
 
+    /**
+     * Constructeur injectant les services nécessaires pour l'authentification.
+     * 
+     * @param visiteurService Service de gestion des visiteurs.
+     * @param jwtService Service de gestion des tokens JWT.
+     */
     public AuthController(VisiteurService visiteurService, JwtService jwtService) {
         this.visiteurService = visiteurService;
         this.jwtService = jwtService;
     }
 
+    /**
+     * Endpoint permettant à un visiteur de se connecter.
+     * Vérifie les identifiants et génère un token JWT en cas de succès.
+     * 
+     * @param connexionVisiteurDTO Objet contenant les informations de connexion (email, mot de passe).
+     * @return Une réponse HTTP contenant soit un token JWT en cas de succès, soit un message d'erreur en cas d'échec.
+     */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody ConnexionVisiteurDTO connexionVisiteurDTO) {
-        String email = connexionVisiteurDTO.getEmail();  // Utiliser getEmail() à partir de ConnexionVisiteurDTO
-        String password = connexionVisiteurDTO.getPassword();  // Utiliser getPassword() à partir de ConnexionVisiteurDTO
+        // Récupération des identifiants depuis le DTO
+        String email = connexionVisiteurDTO.getEmail();
+        String password = connexionVisiteurDTO.getPassword();
 
-        System.out.println("📢 Tentative de connexion pour : " + email);  // 🔥 Vérification console
+        System.out.println("📢 Tentative de connexion pour : " + email);  // 🔥 Log pour suivi
 
-        // Vérifier les identifiants
+        // Authentifier le visiteur avec les identifiants fournis
         VisiteurDTO visiteur = visiteurService.authenticateVisiteur(email, password);
 
+        // Si l'authentification échoue, retourner une erreur 401 (Unauthorized)
         if (visiteur == null) {
             System.out.println("❌ Erreur : Identifiants incorrects !");
             return ResponseEntity.status(401).body(Collections.singletonMap("error", "Email ou mot de passe incorrect"));
         }
 
-        // Générer un token JWT
+        // Génération du token JWT après une authentification réussie
         String token = jwtService.generateToken(email);
-        System.out.println("✅ Jeton généré : " + token);  // 🔥 Vérification console
+        System.out.println("✅ Jeton généré : " + token);  // 🔥 Log pour vérification
 
-        // Créer une réponse avec les informations nécessaires
+        // Création de l'objet réponse contenant le token et les informations du visiteur
         LoginResponse loginResponse = new LoginResponse(token, visiteur.getEmailVisiteur(), visiteur.getNomVisiteur());
 
-        // Retourner la réponse avec le token et les autres informations
+        // Retourner une réponse HTTP 200 avec le token
         return ResponseEntity.ok(Collections.singletonMap("token", loginResponse.getToken()));
     }
 }

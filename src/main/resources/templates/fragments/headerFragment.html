@@ -149,5 +149,17 @@
                 authButton.href = "/connexion"; // Redirection vers la page de connexion
             }
         });
+        document.addEventListener("DOMContentLoaded", function () {
+            let authButton = document.getElementById("authButton");
+
+            if (authButton) {
+                if (authButton.textContent.trim() === "Se déconnecter") {
+                    authButton.classList.add("btn", "btn-primary"); // Ajoute les classes Bootstrap
+                } else {
+                    authButton.classList.remove("btn", "btn-primary"); // Supprime si ce n'est pas "Se déconnecter"
+                }
+            }
+        });
+
     </script>
     
