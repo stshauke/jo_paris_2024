@@ -4,15 +4,19 @@ import com.jo_paris_2024.dto.ConnexionVisiteurDTO;
 import com.jo_paris_2024.dto.VisiteurDTO;
 import com.jo_paris_2024.service.VisiteurService;
 import com.jo_paris_2024.service.JwtService;
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.jo_paris_2024.controller.ErrorResponse;
-
+import org.springframework.ui.Model;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,11 +43,12 @@ public class VisiteurController {
     /**
      * Récupère tous les visiteurs.
      */
-    @GetMapping
+    @GetMapping("/getAllVisiteurs")
     public ResponseEntity<List<VisiteurDTO>> getAllVisiteurs() {
         List<VisiteurDTO> visiteurs = visiteurService.getAllVisiteurs();
         return ResponseEntity.ok(visiteurs);
     }
+
 
     /**
      * Enregistre un nouveau visiteur.
@@ -123,4 +128,5 @@ public class VisiteurController {
     public String getCleVisiteurById(@PathVariable Long id_visiteur) {
         return visiteurService.getCleVisiteurById(id_visiteur);
     }
+    
 }

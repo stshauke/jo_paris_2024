@@ -1,5 +1,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:insert="fragments/headerFragment :: headerFragment"></head>
+<head th:insert="fragments/headerFragment :: headerFragment">
+<style type="text/css">
+.btn:hover {
+       background-color:green;
+}
+.btn.btn-primary:hover {
+    color: green !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+</style>
+
+</head>
 
 <body>
     <div class="container mt-5 w-75">

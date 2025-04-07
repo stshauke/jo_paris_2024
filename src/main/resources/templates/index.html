@@ -2,6 +2,54 @@
   <head th:insert="fragments/headerFragment :: headerFragment"></head>
 
 
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+
+  .title-section h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+   
+    color: #222;
+    border-bottom: 3px solid #007bff;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+
+  .intro-jo, .epreuves {
+    padding: 20px 0;
+  }
+
+  .epreuves h4 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #007bff;
+  }
+
+  .epreuves p {
+    font-size: 1rem;
+    color: #444;
+  }
+
+  .col-md-4 {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .col-md-4:hover {
+    transform: translateY(-5px);
+  }
+  
+</style>
 
 <body>
     
@@ -28,7 +76,77 @@
   </div>
 </div>
 
-  
+   <!-- Présentation des Jeux Olympiques -->
+<div class="intro-jo">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 title-section">
+        <h2 class="heading" style="color:black;">Les Jeux Olympiques</h2>
+        <p style="color:black;">
+          Les Jeux Olympiques sont un événement sportif international majeur qui réunit des athlètes du monde entier. Créés dans la Grèce antique, ils sont aujourd’hui organisés tous les quatre ans, en été et en hiver.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quelques épreuves -->
+<div class="epreuves">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-12 title-section">
+        <h2 class="heading" style="color:black;">Quelques épreuves</h2>
+      </div>
+      <div class="row g-4">
+  <!-- Athlétisme -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Athlétisme</h4>
+    <p style="color:black;">Course à pied, saut en longueur, lancer...</p>
+    <img src="images/Athlétisme.jpg" alt="Athlétisme" class="sport-img">
+  </div>
+
+  <!-- Natation -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Natation</h4>
+    <p style="color:black;">Les nageurs s'affrontent dans différentes distances.</p>
+    <img src="images/Natation.jpg" alt="Natation" class="sport-img">
+  </div>
+
+  <!-- Judo -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Judo</h4>
+    <p style="color:black;">Un sport de combat d'origine japonaise.</p>
+    <img src="images/Judo.jpg" alt="Judo" class="sport-img">
+  </div>
+
+  <!-- Gymnastique -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Gymnastique</h4>
+    <p style="color:black;">Un sport artistique et physique impressionnant.</p>
+    <img src="images/Gymnastique.jpg" alt="Gymnastique" class="sport-img">
+  </div>
+
+  <!-- Basket-ball -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Basket-ball</h4>
+    <p style="color:black;">Un sport collectif très spectaculaire.</p>
+    <img src="images/Basket-ball.jpg" alt="Basket-ball" class="sport-img">
+  </div>
+
+  <!-- Tennis -->
+  <div class="col-md-4 text-center">
+    <h4 style="color:black;">Tennis</h4>
+    <p style="color:black;">Un sport où les meilleurs joueurs mondiaux s'affrontent.</p>
+    <img src="images/Tennis.jpg" alt="Tennis" class="sport-img">
+  </div>
+</div>
+      
+    </div>
+  </div>
+</div>
+
+    
+   
 
     <div class="latest-news">
       <div class="container">

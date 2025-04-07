@@ -76,9 +76,10 @@ font-weight: bolder; }
     -webkit-box-shadow: none !important;
     box-shadow: none !important; }
   .btn.btn-primary:hover {
-    border-color: #fff;
-    background: transparent;
-    color: #fff; }
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    }
   .btn.btn-black {
     border-width: 2px;
     border-color: #000;
