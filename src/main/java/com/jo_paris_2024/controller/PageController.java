@@ -47,6 +47,12 @@ public class PageController {
         return "visiteur"; // Renvoie le fichier visiteur.html
     }
 
+    
+    @GetMapping("/billetAchetes") // Page des visiteurs
+    public String billetAchetesPage(Model model) {
+        model.addAttribute("activePage", "billetAchetes"); // Ajouter l'attribut "activePage" pour la page des visiteurs
+        return "billetAchetes"; // Renvoie le fichier billetAchates.html
+    }
     @GetMapping("/inscription") // Page d'inscription
     public String inscription_visiteurPage(Model model) {
         model.addAttribute("activePage", "inscription"); // Ajouter l'attribut "activePage" pour la page d'inscription

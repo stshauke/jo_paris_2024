@@ -172,6 +172,21 @@ public class PanierService {
                 ))
                 .collect(Collectors.toList());
     }
+ // Récupérer tous les paniers
+    public List<PanierDTO> getAllBilletsAchetes() {
+        List<Panier> panierList = panierRepository.findAll();
+        return panierList.stream()
+                .map(panier -> new PanierDTO(
+                        panier.getId_panier(),
+                        panier.getId_visiteur(),
+                        panier.getId_billet(),
+                        panier.getIdentifiant_billet(),
+                        panier.getDate_ajout(),
+                        panier.getCle_unique(),
+                        panier.getQr_code_image()
+                ))
+                .collect(Collectors.toList());
+    }
 
     // Récupérer un panier par ID
     public PanierDTO getPanier(Long panierId) {

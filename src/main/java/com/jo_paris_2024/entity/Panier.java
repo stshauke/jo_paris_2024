@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDateTime;
 
@@ -32,11 +34,23 @@ public class Panier {
     @Column(name="qr_code_image")
     private byte[] qr_code_image;
 
+ // Quantité de billets dans ce panier
+    @Column(name = "quantite")
+    private Integer quantite;
+
+    // Prix unitaire du billet (ou total selon ta logique)
+    @Column(name = "prix")
+    private Double prix;
+
+    
+    
+    
+    
     // Constructeur par défaut
     public Panier() {}
 
     // Constructeur avec arguments
-    public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
+    /*public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
     		String identifiant_billet, LocalDateTime date_ajout, String cle_unique, byte[] qrCodeImage) {
     	this.id_panier = id_panier;
     	this.id_visiteur = id_visiteur;
@@ -45,6 +59,32 @@ public class Panier {
         this.date_ajout = date_ajout;
         this.cle_unique = cle_unique;
         this.qr_code_image = qr_code_image;
+    }*/
+ // Ancien constructeur (à garder pour compatibilité avec ton code existant)
+    public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
+        String identifiant_billet, LocalDateTime date_ajout, String cle_unique, byte[] qr_code_image) {
+        this.id_panier = id_panier;
+        this.id_visiteur = id_visiteur;
+        this.id_billet = id_billet;
+        this.identifiant_billet = identifiant_billet;
+        this.date_ajout = date_ajout;
+        this.cle_unique = cle_unique;
+        this.qr_code_image = qr_code_image;
+    }
+
+    // Nouveau constructeur enrichi pour les méthodes qui en ont besoin
+    public Panier(Integer id_panier, Integer id_visiteur, Integer id_billet, 
+        String identifiant_billet, LocalDateTime date_ajout, String cle_unique, byte[] qr_code_image,
+        Integer quantite, Double prix) {
+        this.id_panier = id_panier;
+        this.id_visiteur = id_visiteur;
+        this.id_billet = id_billet;
+        this.identifiant_billet = identifiant_billet;
+        this.date_ajout = date_ajout;
+        this.cle_unique = cle_unique;
+        this.qr_code_image = qr_code_image;
+        this.quantite = quantite;
+        this.prix = prix;
     }
 
     // Getters et Setters
@@ -102,5 +142,38 @@ public class Panier {
     }
     public void setQr_code_image(byte[] qr_code_image) {
     	this.qr_code_image=qr_code_image;
+    }
+    
+    public Integer getQuantite() {
+        return quantite;
+    }
+
+    public void setQuantite(Integer quantite) {
+        this.quantite = quantite;
+    }
+
+    public Double getPrix() {
+        return prix;
+    }
+
+    public void setPrix(Double prix) {
+        this.prix = prix;
+    }
+    
+    @ManyToOne
+    @JoinColumn(name = "id_visiteur", insertable = false, updatable = false)
+    private Visiteur visiteur;
+
+    @ManyToOne
+    @JoinColumn(name = "id_billet", insertable = false, updatable = false)
+    private Billet billet;
+
+    // Getters
+    public Visiteur getVisiteur() {
+        return visiteur;
+    }
+
+    public Billet getBillet() {
+        return billet;
     }
 }

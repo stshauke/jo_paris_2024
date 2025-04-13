@@ -54,21 +54,34 @@
     </li>
                <li th:classappend="${activePage == 'stade'} ? 'active' : ''">
         <a href="/stade" th:text="'Stade'"></a>
-    </li>
-                <li th:classappend="${activePage == 'visiteur'} ? 'active' : ''">
-        <a href="/visiteur" th:text="'Visiteur'"></a>
-    </li>
-                <li th:classappend="${activePage == 'Offres' or activePage == 'Billets' or activePage == 'Achat'} ? 'active open' : ''" class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="offreBilletDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" 
-       aria-expanded="${activePage == 'Offres' or activePage == 'Billets' or activePage == 'Achat' ? 'true' : 'false'}">
-        Offres et Billets
-    </a>
-    <div class="dropdown-menu" aria-labelledby="offreBilletDropdown">
-        <a class="dropdown-item" th:classappend="${activePage == 'Offres'} ? 'active' : ''" href="/offre">Offres</a>
-        <a class="dropdown-item" th:classappend="${activePage == 'Billets'} ? 'active' : ''" href="/billet">Billets</a>
-        <a class="dropdown-item" th:classappend="${activePage == 'Achat'} ? 'active' : ''" href="/achat">Acheter Billets</a>
-    </div>
-</li>
+ 
+					               <li th:classappend="${activePage == 'Offres' or activePage == 'Billets' or activePage == 'Achat'} ? 'active' : ''" class="nav-item dropdown">
+					    <a class="nav-link dropdown-toggle" href="#" id="offreBilletDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+					        Offres et Billets
+					    </a>
+					    <div class="dropdown-menu" aria-labelledby="offreBilletDropdown">
+					        <a class="dropdown-item" th:classappend="${activePage == 'Offres'} ? 'active' : ''" href="/offre">Offres</a>
+					        <a class="dropdown-item" th:classappend="${activePage == 'Billets'} ? 'active' : ''" href="/billet">Billets</a>
+					        <a class="dropdown-item" th:classappend="${activePage == 'Achat'} ? 'active' : ''" href="/achat">Acheter Billets</a>
+					    </div>
+					</li>
+
+   </li>
+               
+ 				<li th:classappend="${activePage == 'visiteur' or activePage == 'billetAchetes'} ? 'active open' : ''" class="nav-item dropdown">
+					    <a class="nav-link dropdown-toggle" href="#" id="achatBilletDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" 
+					      >
+					       Espace Admin
+					    </a>
+					    <div class="dropdown-menu" aria-labelledby="achatBilletDropdown">
+					        <a class="dropdown-item" th:classappend="${activePage == 'visiteur'} ? 'active' : ''" href="/visiteur">Visiteurs</a>
+					        <a class="dropdown-item" th:classappend="${activePage == 'billetAchetes'} ? 'active' : ''" href="/billetAchetes">Billets achetés</a>
+					        
+					    </div>
+				</li>
+
+
+
 
 
                 <li><a href="/connexion" class="nav-link" id="authButton">Se connecter</a></li>
@@ -124,42 +137,46 @@
             }
         });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const authButton = document.getElementById('authButton');
-            
-            // Vérifier si l'utilisateur est connecté via le localStorage
-            const emailVisiteur = localStorage.getItem("emailVisiteur");
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const authButton = document.getElementById('authButton');
+        const emailVisiteur = localStorage.getItem("emailVisiteur");
 
-            if (emailVisiteur) {
-            	//alert(emailVisiteur);
-                // Si l'utilisateur est connecté, afficher "Se déconnecter"
-                authButton.textContent = "Se déconnecter";
-                authButton.href = "#"; // On désactive le lien de redirection
+        // Si l'utilisateur est connecté, afficher "Se déconnecter"
+        if (emailVisiteur) {
+            authButton.textContent = "Se déconnecter";
+            authButton.href = "#"; // Le lien n'est pas utilisé pour la déconnexion
 
-                // Déconnexion lorsque l'utilisateur clique sur le bouton
-                authButton.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    localStorage.removeItem("emailVisiteur"); // Supprimer l'email du localStorage
-                    window.location.href = "/"; // Rediriger vers la page d'accueil après déconnexion
-                });
-            } else {
-                // Si l'utilisateur n'est pas connecté, afficher "Se connecter"
-                authButton.textContent = "Se connecter";
-                authButton.href = "/connexion"; // Redirection vers la page de connexion
-            }
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-            let authButton = document.getElementById("authButton");
+            // Ajout de l'événement pour la déconnexion
+            authButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem("emailVisiteur"); // Supprime l'email du localStorage
+                updateButtonState(); // Met à jour l'état du bouton
+                window.location.href = "/"; // Rediriger vers la page d'accueil après déconnexion
+            });
+        } else {
+            // Si l'utilisateur n'est pas connecté, afficher "Se connecter"
+            authButton.textContent = "Se connecter";
+            authButton.href = "/connexion"; // Redirection vers la page de connexion
+        }
+     // Gestion des classes Bootstrap
+        if (authButton.textContent.trim() === "Se déconnecter") {
+            authButton.classList.add("btn", "btn-primary"); // Ajoute les classes Bootstrap
+        } else {
+            authButton.classList.remove("btn", "btn-primary"); // Supprime les classes si ce n'est pas "Se déconnecter"
+        }
+    });
 
-            if (authButton) {
-                if (authButton.textContent.trim() === "Se déconnecter") {
-                    authButton.classList.add("btn", "btn-primary"); // Ajoute les classes Bootstrap
-                } else {
-                    authButton.classList.remove("btn", "btn-primary"); // Supprime si ce n'est pas "Se déconnecter"
-                }
-            }
-        });
+    // Fonction pour mettre à jour l'état du bouton
+    function updateButtonState() {
+        const authButton = document.getElementById('authButton');
+        const emailVisiteur = localStorage.getItem("emailVisiteur");
 
-    </script>
+        if (!emailVisiteur) {
+            authButton.textContent = "Se connecter";
+            authButton.href = "/connexion"; // Redirige vers la page de connexion
+        }
+    }
+</script>
+
     

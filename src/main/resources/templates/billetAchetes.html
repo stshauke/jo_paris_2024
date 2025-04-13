@@ -1,0 +1,171 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/headerFragment :: headerFragment"></head>
+
+<body>
+<div class="container mt-5" id="panierSection" style="display: none;">
+    <h1 class="mb-4">Liste des Billets Achetes</h1>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>ID Visiteur</th>
+            <th>Nom Visiteur</th>
+            <th>Billet</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="panierTableBody"></tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+    </nav>
+
+    <!-- Totaux -->
+    <div class="mt-4 p-3 bg-light rounded shadow-sm">
+        <h5>Récapitulatif des Achats</h5>
+        <p><strong>Total des billets achetés :</strong> <span id="totalQuantite">0</span></p>
+        <p><strong>Total du montant :</strong> <span id="totalPrix">0.00</span> €</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const emailVisiteur = localStorage.getItem("emailVisiteur");
+    const panierSection = document.getElementById('panierSection');
+
+    if (emailVisiteur === "tshaukemulumba@yahoo.com") {
+        panierSection.style.display = "block";
+        loadPaniers();
+        loadTotaux();
+    } else {
+        alert("Accès refusé. Vous n'êtes pas autorisé à accéder à cette page.");
+        window.location.href = "/connexion";
+    }
+});
+
+let allPanierData = []; // Pour stocker toutes les données
+const itemsPerPage = 5;
+let currentPage = 1;
+
+function loadPaniers() {
+    fetch('http://localhost:9090/api/v1/paniers/details')
+        .then(response => response.json())
+        .then(data => {
+            allPanierData = data;
+            currentPage = 1; // reset current page
+            renderTable(currentPage);
+            setupPagination(allPanierData.length); // Appelé une seule fois
+        })
+        .catch(error => console.error("❌ Erreur lors du chargement des paniers :", error));
+}
+
+function renderTable(page) {
+    const tableBody = document.getElementById('panierTableBody');
+    tableBody.innerHTML = '';
+
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedItems = allPanierData.slice(start, end);
+
+    paginatedItems.forEach(panier => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${panier.idPanier}</td>
+            <td>${panier.idVisiteur}</td>
+            <td>${panier.nomVisiteur}</td>
+            <td>${panier.nomBillet}</td>
+            <td>${panier.quantite}</td>
+            <td>${panier.prix.toFixed(2)} €</td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="deletePanier(${panier.idPanier})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    updatePagination(page);
+}
+
+function setupPagination(totalItems) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    const pageCount = Math.ceil(totalItems / itemsPerPage);
+
+    for (let i = 1; i <= pageCount; i++) {
+        const li = document.createElement('li');
+        li.classList.add('page-item');
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+        li.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentPage = i;
+            renderTable(currentPage);
+        });
+
+        pagination.appendChild(li);
+    }
+
+    updatePagination(currentPage); // Pour activer la bonne page après création
+}
+
+function updatePagination(activePage) {
+    const paginationItems = document.querySelectorAll('#pagination .page-item');
+    paginationItems.forEach((item, index) => {
+        if ((index + 1) === activePage) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function loadTotaux() {
+    fetch('http://localhost:9090/api/v1/paniers/details/total-billets')
+        .then(response => response.json())
+        .then(totalQuantite => {
+            document.getElementById('totalQuantite').textContent = totalQuantite;
+        })
+        .catch(error => console.error("❌ Erreur lors du chargement du total des quantités :", error));
+
+    fetch('http://localhost:9090/api/v1/paniers/details/total-montant')
+        .then(response => response.json())
+        .then(totalPrix => {
+            document.getElementById('totalPrix').textContent = totalPrix.toFixed(2);
+        })
+        .catch(error => console.error("❌ Erreur lors du chargement du total du montant :", error));
+}
+
+function deletePanier(id) {
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce panier ?")) {
+        fetch(`http://localhost:9090/api/v1/paniers/${id}`, {
+            method: "DELETE"
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("✅ Panier supprimé avec succès !");
+                loadPaniers();
+                loadTotaux();
+            } else {
+                alert("❌ Erreur lors de la suppression du panier.");
+            }
+        })
+        .catch(error => {
+            console.error("❌ Erreur réseau lors de la suppression :", error);
+            alert("❌ Erreur réseau lors de la suppression du panier.");
+        });
+    }
+}
+</script>
+</body>
+
+<footer class="footer-section">
+    <head th:insert="fragments/footerFragment :: footerFragment"></head>
+</footer>
+</html>
