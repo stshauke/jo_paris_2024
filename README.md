@@ -8,4 +8,5 @@ cd jo_paris_2024
 ./mvnw clean install    # ou ./gradlew build
 
 # 3. Lance l'application sur windows
-mvnw.cmd spring-boot:run  # ou java -jar target/mon-appli-0.0.1-SNAPSHOT.jar
+mvn spring-boot:run
+  # ou java -jar target/mon-appli-0.0.1-SNAPSHOT.jar
