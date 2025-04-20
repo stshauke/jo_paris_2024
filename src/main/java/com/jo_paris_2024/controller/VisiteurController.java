@@ -104,7 +104,7 @@ public class VisiteurController {
 
             // 🔥 Génération du token JWT
             String token = jwtService.generateToken(connexionvisiteurdto.getEmail());
-            System.out.println("✅ Token généré : " + token); // Debug
+            System.out.println("Token généré : " + token); // Debug
 
             // 🔥 Création de la réponse contenant l'utilisateur + le token
             Map<String, Object> response = new HashMap<>();

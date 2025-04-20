@@ -13,24 +13,24 @@ public class PanierDetailsController {
 
     private final PanierDetailsService panierDetailsService;
 
-    // ✅ Constructor injection (plus clean que @Autowired sur le champ)
+    // Constructor injection (plus clean que @Autowired sur le champ)
     public PanierDetailsController(PanierDetailsService panierDetailsService) {
         this.panierDetailsService = panierDetailsService;
     }
 
-    // ✅ Récupérer la liste détaillée des billets achetés
+    // Récupérer la liste détaillée des billets achetés
     @GetMapping("/details")
     public List<PanierDetailsDTO> getAllPanierDetails() {
         return panierDetailsService.getAllPanierDetails();
     }
 
-    // ✅ Nombre total de billets achetés
+    // Nombre total de billets achetés
     @GetMapping("/details/total-billets")
     public long getTotalBilletsAchetes() {
         return panierDetailsService.getTotalBilletsAchetes();
     }
 
-    // ✅ Total du montant des billets achetés
+    // Total du montant des billets achetés
     @GetMapping("/details/total-montant")
     public double getTotalMontantBillets() {
         return panierDetailsService.getTotalMontantBillets();
