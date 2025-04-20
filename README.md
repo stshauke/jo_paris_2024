@@ -1,6 +1,5 @@
 #Cloner et lancer l'application en local
 
-```bash
 # 1. Clone le dépôt
 git clone https://github.com/stshauke/jo_paris_2024.git
 cd jo_paris_2024
