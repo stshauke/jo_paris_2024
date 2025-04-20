@@ -1,40 +1,50 @@
 package com.jo_paris_2024.service;
 
+// Importation des classes nécessaires pour l'authentification Spring Security
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+// Annotation pour indiquer que cette classe est un service Spring (bean de service)
 import org.springframework.stereotype.Service;
+// Importation du DTO Visiteur
 import com.jo_paris_2024.dto.VisiteurDTO;
 
+// Annotation pour déclarer un service Spring géré par le conteneur
 @Service
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
-    private final VisiteurService visiteurService;
-    private final JwtService jwtService;
+    // Déclaration des dépendances du service
+    private final AuthenticationManager authenticationManager; // Gère le processus d'authentification
+    private final VisiteurService visiteurService; // Service métier pour gérer les visiteurs
+    private final JwtService jwtService; // Service pour gérer les tokens JWT
 
+    // Constructeur pour injecter les dépendances via injection de dépendances
     public AuthService(AuthenticationManager authenticationManager, VisiteurService visiteurService, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
         this.visiteurService = visiteurService;
         this.jwtService = jwtService;
     }
 
+    // Méthode pour authentifier un utilisateur via son email et mot de passe
     public String authenticate(String email, String password) {
-        // Effectue l'authentification via AuthenticationManager pour lever une exception en cas d'erreur
+        // Utilisation de AuthenticationManager pour valider les identifiants
+        // Si l'authentification échoue, une exception est levée
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
-        // Utilise VisiteurService pour vérifier les identifiants (ou retourner le visiteur authentifié)
+        // Appel au VisiteurService pour vérifier les informations du visiteur ou obtenir ses détails
         VisiteurDTO visiteur = visiteurService.authenticateVisiteur(email, password);
 
-        // Génère le token JWT à partir de l'email
+        // Génération d'un token JWT pour l'utilisateur authentifié
         return jwtService.generateToken(email);
     }
 
- // Méthode pour valider un token JWT
+    // Méthode pour vérifier la validité d'un token JWT par rapport à un email donné
     public boolean isTokenValid(String token, String email) {
         try {
-            return jwtService.isTokenValid(token, email); // Correction ici
+            // Vérifie si le token est valide pour l'email donné
+            return jwtService.isTokenValid(token, email);
         } catch (Exception e) {
-            return false;  // En cas d'exception (token invalide), retourne false
+            // En cas d'exception (ex : token expiré ou signature invalide), retourne false
+            return false;
         }
     }
 
