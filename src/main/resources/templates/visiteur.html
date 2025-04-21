@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadVisiteurs() {
-	 fetch('http://localhost:9090/api/v1/visiteurs/getAllVisiteurs')
+	 fetch('/api/v1/visiteurs/getAllVisiteurs')
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('visiteurTableBody');
@@ -73,7 +73,7 @@ function loadVisiteurs() {
 
     function deleteVisiteur(id) {
         if (confirm("Êtes-vous sûr de vouloir supprimer ce visiteur ?")) {
-            fetch(`http://localhost:9090/api/v1/visiteurs/${id}`, {
+            fetch(`/api/v1/visiteurs/${id}`, {
                 method: "DELETE",
             })
             .then(response => {
