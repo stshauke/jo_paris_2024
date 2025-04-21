@@ -173,7 +173,7 @@
             const nombrePersonnes = document.getElementById('nombrePersonnes').value;
             const dateFin = document.getElementById('dateFin').value;
 
-            fetch("http://localhost:9090/api/v1/offres/saveOffre", {
+            fetch("/api/v1/offres/saveOffre", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -195,7 +195,7 @@
 
     function loadOffres() {
     	 let userEmail = localStorage.getItem('emailVisiteur');
-        fetch('http://localhost:9090/api/v1/offres/getAllOffres')
+        fetch('/api/v1/offres/getAllOffres')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById('offreTableBody');
@@ -234,7 +234,7 @@
             });
     }
     function showOffre(id) {
-        fetch(`http://localhost:9090/api/v1/offres/${id}`)
+        fetch(`/api/v1/offres/${id}`)
             .then(response => response.json())
             .then(offre => {
                 // Remplir les champs du modal avec les détails de l'offre
@@ -255,7 +255,7 @@
     }
 
     function viewOffre(id) {
-        fetch(`http://localhost:9090/api/v1/offres/${id}`)
+        fetch(`/api/v1/offres/${id}`)
             .then(response => response.json())
             .then(offre => {
                 document.getElementById('editOffreId').value = offre.id_offre;
@@ -283,7 +283,7 @@
         const nombrePersonnes = document.getElementById('editNombrePersonnes').value;
         const dateFin = document.getElementById('editDateFin').value;
 
-        fetch('http://localhost:9090/api/v1/offres/updateOffre', {
+        fetch('/api/v1/offres/updateOffre', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -302,7 +302,7 @@
     }
 
     function deleteOffre(id) {
-        fetch('http://localhost:9090/api/v1/offres/deleteOffre', {
+        fetch('/api/v1/offres/deleteOffre', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_offre: id }),

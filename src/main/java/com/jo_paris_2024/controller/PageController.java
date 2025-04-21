@@ -85,7 +85,7 @@ public class PageController {
         
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            System.out.println("✅ Token trouvé dans l'en-tête: " + token.substring(0, 15) + "...");
+            System.out.println("Token trouvé dans l'en-tête: " + token.substring(0, 15) + "...");
         }
         
         // 2. Si pas dans l'en-tête, chercher dans les cookies
@@ -95,7 +95,7 @@ public class PageController {
                 for (Cookie cookie : cookies) {
                     if ("jwtToken".equals(cookie.getName())) {
                         token = cookie.getValue();
-                        System.out.println("✅ Token trouvé dans les cookies: " + token.substring(0, 15) + "...");
+                        System.out.println("Token trouvé dans les cookies: " + token.substring(0, 15) + "...");
                         break;
                     }
                 }

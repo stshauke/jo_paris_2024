@@ -94,7 +94,7 @@
         function loadBillets() {
             const token = localStorage.getItem("jwtToken");
 
-            fetch('http://localhost:9090/api/v1/offres/getAllOffres', {
+            fetch('/api/v1/offres/getAllOffres', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -117,7 +117,7 @@
                     offres[offre.id_offre] = offre.nom_offre;
                 });
 
-                fetch('http://localhost:9090/api/v1/billets/getAllBillets', {
+                fetch('/api/v1/billets/getAllBillets', {
                     method: 'GET',
                     headers: {
                         "Content-Type": "application/json",
@@ -203,7 +203,7 @@
             const montantTotal = panier.reduce((total, billet) => total + billet.prix, 0);
 
             // Envoi de la requête de paiement
-            fetch('http://localhost:9090/api/v1/paiement/simuler', {
+            fetch('/api/v1/paiement/simuler', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -246,7 +246,7 @@
                 return;
             }
 
-            fetch(`http://localhost:9090/api/v1/visiteurs/email/${emailVisiteur}`, {
+            fetch(`/api/v1/visiteurs/email/${emailVisiteur}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -267,7 +267,7 @@
                     dateAjout: new Date().toISOString()
                 }));
 
-                return fetch('http://localhost:9090/api/v1/paniers/savePanier', {
+                return fetch('/api/v1/paniers/savePanier', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
