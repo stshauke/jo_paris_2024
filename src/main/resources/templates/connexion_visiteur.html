@@ -65,7 +65,7 @@
             submitButton.disabled = true;
             submitButton.textContent = "Connexion en cours...";
 
-            fetch("http://localhost:9090/api/v1/visiteurs/login", {
+            fetch("/api/v1/visiteurs/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -129,7 +129,7 @@
                     return;
                 }
 
-                fetch("http://localhost:9090/api/v1/protected-endpoint", {
+                fetch("/api/v1/protected-endpoint", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
