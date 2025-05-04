@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:insert="fragments/headerFragment :: headerFragment">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+   <script src="https://js.stripe.com/v3/"></script>
    
 </head>
 <body>
@@ -85,8 +86,9 @@
             
             // Écouter l'événement pour effectuer le paiement
             document.getElementById('payer').addEventListener('click', function() {
-                mockPaiement();
+                realPaiement();
             });
+
         });
 
         let offres = {};
@@ -198,43 +200,40 @@
             afficherPanier();
         }
 
-        function mockPaiement() {
-            // Calculer le montant total du panier
-            const montantTotal = panier.reduce((total, billet) => total + billet.prix, 0);
+        async function realPaiement() {
+            const stripe = Stripe("pk_test_51RL55YGdpCU3R65m7AtsOKAL15BZtByse4QAJ2tLVILxCsRT61ZwRjZZXLpeXBBlsD2lAD6RW0qIiupNZGruHXpu00BqpB1YmP"); // Remplace par ta clé publique Stripe
 
-            // Envoi de la requête de paiement
-            fetch('/api/v1/paiement/simuler', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    idVisiteur: 12,  // Remplace par l'ID réel du visiteur
-                    montant: montantTotal  // Le montant total du panier
-                })
-            })
-            .then(response => {
+            // Construire les données du panier à envoyer au backend
+            const panierDTO = panier.map(b => ({
+                type: b.type,
+                prix: b.prix
+            }));
+
+            try {
+                const response = await fetch("/api/v1/payment/create-checkout-session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(panierDTO)
+                });
+
                 if (!response.ok) {
-                    throw new Error('Erreur lors de la requête');
+                    throw new Error("Erreur lors de la création de la session Stripe");
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);  // Affiche la réponse pour voir le message JSON
 
-                if (data.message && data.message.includes("succès")) {
-                    // Si le paiement a réussi, activer le bouton de finalisation
-                    document.getElementById('finaliserAchat').disabled = false;
-                    alert(`Paiement de ${montantTotal}€ effectué avec succès.`);  // Afficher le montant dans l'alerte
-                } else {
-                    // Si le paiement a échoué, afficher un message d'erreur
-                    alert("Le paiement a échoué : " + data.message);
+                const data = await response.json();
+
+                // Rediriger vers la page Stripe Checkout
+                const result = await stripe.redirectToCheckout({
+                    sessionId: data.id
+                });
+
+                if (result.error) {
+                    alert(result.error.message);
                 }
-            })
-            .catch(error => {
-                console.error('Erreur lors du paiement:', error);
+            } catch (err) {
+                console.error(err);
                 alert("Une erreur est survenue lors du paiement.");
-            });
+            }
         }
 
         function finaliserAchat() {
