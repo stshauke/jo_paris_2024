@@ -52,8 +52,8 @@ public class StripeController {
 
         SessionCreateParams params = SessionCreateParams.builder()
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("/success")
-            .setCancelUrl("/cancel")
+            .setSuccessUrl("https://jo-paris-2024-e9ec8c2ec4e6.herokuapp.com/success")
+            .setCancelUrl("https://jo-paris-2024-e9ec8c2ec4e6.herokuapp.com/cancel")
             .addAllLineItem(lineItems)
             .build();
 
