@@ -112,7 +112,7 @@ public class PanierService {
         
         
         // Envoi de l'email avec les détails du billet et la date d'ajout
-        String emailVisiteur = visiteur.getEmail_visiteur();
+        String emailVisiteur = visiteur.getEmailVisiteur();
         String nomPrenomVisiteur = visiteur.getNom_visiteur() + " " + visiteur.getPrenom_visiteur();
         String subject = "Votre billet avec QR Code";
         String body = String.format(

@@ -68,7 +68,7 @@ public class VisiteurService {
                 .orElseThrow(() -> new RuntimeException("Visiteur introuvable"));
 
         // Vérification de l'unicité de l'email (sauf si c'est l'email du visiteur actuel)
-        if (!visiteur.getEmail_visiteur().equals(visiteurDTO.getEmailVisiteur()) &&
+        if (!visiteur.getEmailVisiteur().equals(visiteurDTO.getEmailVisiteur()) &&
                 visiteurRepository.existsByEmailVisiteur(visiteurDTO.getEmailVisiteur())) {
             throw new RuntimeException("Un visiteur avec cet email existe déjà.");
         }
@@ -76,7 +76,7 @@ public class VisiteurService {
         // Mise à jour des champs
         visiteur.setNom_visiteur(visiteurDTO.getNomVisiteur());
         visiteur.setPrenom_visiteur(visiteurDTO.getPrenomVisiteur());
-        visiteur.setEmail_visiteur(visiteurDTO.getEmailVisiteur());
+        visiteur.setEmailVisiteur(visiteurDTO.getEmailVisiteur());
 
         // Mise à jour du mot de passe si fourni
         if (visiteurDTO.getPasswordVisiteur() != null && !visiteurDTO.getPasswordVisiteur().isBlank()) {
@@ -113,7 +113,7 @@ public class VisiteurService {
                 visiteur.getId_visiteur(),
                 visiteur.getNom_visiteur(),
                 visiteur.getPrenom_visiteur(),
-                visiteur.getEmail_visiteur(),
+                visiteur.getEmailVisiteur(),
                 null, // Le mot de passe n'est pas renvoyé pour des raisons de sécurité
                 visiteur.getSolde_visiteur(),
                 visiteur.getCle_visiteur()

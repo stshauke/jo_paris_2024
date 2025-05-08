@@ -82,13 +82,12 @@ public class Visiteur {
     }
 
     // Getter pour l'email du visiteur
-    public String getEmail_visiteur() {
+    public String getEmailVisiteur() {
         return emailVisiteur;
     }
 
-    // Setter pour l'email du visiteur
-    public void setEmail_visiteur(String email_visiteur) {
-        this.emailVisiteur = email_visiteur;
+    public void setEmailVisiteur(String emailVisiteur) {
+        this.emailVisiteur = emailVisiteur;
     }
 
     // Getter pour le mot de passe du visiteur

@@ -176,4 +176,12 @@ public class Panier {
     public Billet getBillet() {
         return billet;
     }
+    public void setBillet(Billet billet) {
+        this.billet = billet;
+    }
+
+    public void setVisiteur(Visiteur visiteur) {
+        this.visiteur = visiteur;
+    }
+
 }

@@ -1,53 +1,114 @@
 package com.jo_paris_2024.service;
 
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import com.jo_paris_2024.entity.Billet;
+import com.jo_paris_2024.entity.Panier;
+import com.jo_paris_2024.entity.Visiteur;
+import com.jo_paris_2024.repository.BilletRepository;
+import com.jo_paris_2024.repository.PanierRepository;
+import com.jo_paris_2024.repository.VisiteurRepository;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 
-/**
- * Service responsable de la gestion des paiements.
- * Ce service permet d'effectuer des paiements et enregistre les résultats de ces opérations via des logs.
- */
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 @Service
-@Transactional  // Cette annotation indique que les méthodes de cette classe doivent être exécutées dans une transaction.
+@Transactional
 public class PaiementService {
 
-    // Déclaration d'un logger pour enregistrer les événements dans le système de logs.
-    // Utilisation de SLF4J (Simple Logging Facade for Java) avec Logback (implémentation par défaut dans Spring Boot).
     private static final Logger logger = LoggerFactory.getLogger(PaiementService.class);
 
+    @Autowired
+    private VisiteurRepository visiteurRepository;
+
+    @Autowired
+    private BilletRepository billetRepository;
+
+    @Autowired
+    private PanierRepository panierRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
     /**
-     * Méthode permettant d'effectuer un paiement pour un montant donné.
-     * 
-     * @param montant Le montant à payer. Si ce montant est positif, le paiement est considéré comme réussi.
-     * @return true si le paiement est effectué avec succès, false sinon (si le montant est invalide).
+     * Méthode de simulation utilisée pour les tests.
      */
     public boolean effectuerPaiement(double montant) {
-        // Vérifie si le montant est positif avant d'effectuer le paiement
         if (montant > 0) {
-            // Si le montant est valide (positif), un log d'information est généré et le paiement est considéré comme réussi
-            logger.info("Paiement de {}€ effectué avec succès.", montant);
+            logger.info("Paiement simulé de {}€ effectué avec succès.", montant);
             return true;
         } else {
-            // Si le montant est invalide (négatif ou égal à zéro), un log d'erreur est généré
-            logger.error("Erreur lors du paiement : montant invalide.");
+            logger.error("Erreur lors du paiement simulé : montant invalide.");
             return false;
         }
     }
+
+    /**
+     * Méthode appelée après un paiement réel via Stripe.
+     * Elle réduit le stock, enregistre les achats et envoie un mail.
+     */
     public void traiterPaiementApresSuccess(String email, List<Map<String, Object>> billets) {
-        // Pour l'instant, on simule juste l'effet par un log
-        logger.info("Paiement confirmé pour l'utilisateur : {}", email);
-        logger.info("Billets achetés : {}", billets);
+        logger.info("Traitement du paiement réel pour {}", email);
 
-        // Plus tard ici :
-        // - réduction stock
-        // - sauvegarde en base
-        // - envoi email
+        Visiteur visiteur = visiteurRepository.findByEmailVisiteur(email)
+                .orElseThrow(() -> new RuntimeException("Visiteur non trouvé avec l'email : " + email));
+
+        StringBuilder contenuMail = new StringBuilder("Merci pour votre achat !\n\nVoici les billets achetés :\n");
+
+        for (Map<String, Object> billetMap : billets) {
+            Long idBillet = Long.valueOf(billetMap.get("id").toString());
+
+            Billet billet = billetRepository.findById(idBillet)
+                    .orElseThrow(() -> new RuntimeException("Billet introuvable avec l'ID : " + idBillet));
+
+            if (billet.getStock() <= 0) {
+                throw new RuntimeException("Stock insuffisant pour le billet " + billet.getId_billet());
+            }
+
+            // Réduction du stock
+            billet.setStock(billet.getStock() - 1);
+            billetRepository.save(billet);
+
+            // Création du panier
+            Panier panier = new Panier();
+            panier.setId_billet(Math.toIntExact(billet.getId_billet()));
+            panier.setId_visiteur(Math.toIntExact(visiteur.getId_visiteur()));
+            panier.setBillet(billet);
+            panier.setVisiteur(visiteur);
+            panier.setDate_ajout(LocalDateTime.now());
+            panier.setIdentifiant_billet("BILLET-" + billet.getId_billet());
+            panier.setCle_unique(UUID.randomUUID().toString());
+            panier.setQuantite(1);
+            panier.setPrix(billet.getPrix_billet().doubleValue());
+
+
+            panierRepository.save(panier);
+
+            // Contenu de l'email
+            contenuMail.append("• ").append(billet.getType_billet())
+                       .append(" - ").append(billet.getPrix_billet())
+                       .append("€\n");
+        }
+
+        // Envoi de l'email de confirmation
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Confirmation d'achat - JO Paris 2024");
+            message.setText(contenuMail.toString());
+
+            mailSender.send(message);
+            logger.info("Email de confirmation envoyé à {}", email);
+        } catch (Exception e) {
+            logger.error("Erreur lors de l'envoi de l'email de confirmation à {}", email, e);
+        }
     }
-
 }
