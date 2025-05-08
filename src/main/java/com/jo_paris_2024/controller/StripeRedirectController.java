@@ -1,16 +1,14 @@
 package com.jo_paris_2024.controller;
 
-import java.util.List;
-import java.util.Map;
-
+import com.jo_paris_2024.service.PaiementService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.jo_paris_2024.service.PaiementService;
-
-import org.springframework.ui.Model; // ✅ Correct
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class StripeRedirectController {
@@ -25,18 +23,18 @@ public class StripeRedirectController {
 
         if (email != null && panier != null) {
             paiementService.traiterPaiementApresSuccess(email, panier);
-
-            // Nettoyer la session
             session.removeAttribute("emailVisiteur");
             session.removeAttribute("panier");
+        } else {
+            System.out.println("⚠️ Email ou panier introuvable en session !");
         }
 
         model.addAttribute("message", "Paiement réussi !");
-        return "success";
+        return "success"; // retourne vers success.html
     }
 
     @GetMapping("/cancel")
     public String paymentCancel() {
-        return "cancel";
+        return "cancel"; // retourne vers cancel.html
     }
 }

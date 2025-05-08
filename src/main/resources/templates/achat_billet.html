@@ -196,16 +196,31 @@
         }
 
         async function realPaiement() {
-            const stripe = Stripe("pk_test_51RL55YGdpCU3R65m7AtsOKAL15BZtByse4QAJ2tLVILxCsRT61ZwRjZZXLpeXBBlsD2lAD6RW0qIiupNZGruHXpu00BqpB1YmP"); // Remplace par ta clé publique Stripe
-            console.log("Stripe objet:", Stripe); // <-- Pour vérifier qu'il est bien chargé
+            const stripe = Stripe("pk_test_51RL55YGdpCU3R65m7AtsOKAL15BZtByse4QAJ2tLVILxCsRT61ZwRjZZXLpeXBBlsD2lAD6RW0qIiupNZGruHXpu00BqpB1YmP");
 
-            // Construire les données du panier à envoyer au backend
+            const email = localStorage.getItem("emailVisiteur");
             const panierDTO = panier.map(b => ({
+                id: b.id,
                 type: b.type,
                 prix: b.prix
             }));
 
             try {
+                // ✅ Étape 1 : enregistrer email + panier dans la session côté backend
+                const cacheResponse = await fetch("/api/v1/paiement/cache-session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: email,
+                        billets: panierDTO
+                    })
+                });
+
+                if (!cacheResponse.ok) {
+                    throw new Error("Erreur lors de la mise en cache du panier avant redirection Stripe.");
+                }
+
+                // ✅ Étape 2 : créer une session Stripe et rediriger
                 const response = await fetch("/api/v1/payment/create-checkout-session", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -218,7 +233,7 @@
 
                 const data = await response.json();
 
-                // Rediriger vers la page Stripe Checkout
+                // ✅ Étape 3 : rediriger vers Stripe Checkout
                 const result = await stripe.redirectToCheckout({
                     sessionId: data.id
                 });
@@ -227,10 +242,11 @@
                     alert(result.error.message);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Erreur Stripe :", err);
                 alert("Une erreur est survenue lors du paiement.");
             }
         }
+
 
         function finaliserAchat() {
             const token = localStorage.getItem("jwtToken");
