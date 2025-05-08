@@ -1,5 +1,8 @@
 package com.jo_paris_2024.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,4 +39,15 @@ public class PaiementService {
             return false;
         }
     }
+    public void traiterPaiementApresSuccess(String email, List<Map<String, Object>> billets) {
+        // Pour l'instant, on simule juste l'effet par un log
+        logger.info("Paiement confirmé pour l'utilisateur : {}", email);
+        logger.info("Billets achetés : {}", billets);
+
+        // Plus tard ici :
+        // - réduction stock
+        // - sauvegarde en base
+        // - envoi email
+    }
+
 }
