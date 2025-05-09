@@ -11,28 +11,22 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.io.ByteArrayOutputStream;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
-
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mail.javamail.MimeMessageHelper;
-
-import jakarta.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
-
-
-
 
 @Service
 @Transactional
@@ -52,9 +46,6 @@ public class PaiementService {
     @Autowired
     private JavaMailSender mailSender;
 
-    /**
-     * Méthode de simulation utilisée pour les tests.
-     */
     public boolean effectuerPaiement(double montant) {
         if (montant > 0) {
             logger.info("Paiement simulé de {}€ effectué avec succès.", montant);
@@ -65,17 +56,17 @@ public class PaiementService {
         }
     }
 
-    /**
-     * Méthode appelée après un paiement réel via Stripe.
-     * Elle réduit le stock, enregistre les achats et envoie un mail.
-     */
     public void traiterPaiementApresSuccess(String email, List<Map<String, Object>> billets) {
         logger.info("Traitement du paiement réel pour {}", email);
 
         Visiteur visiteur = visiteurRepository.findByEmailVisiteur(email)
                 .orElseThrow(() -> new RuntimeException("Visiteur non trouvé avec l'email : " + email));
 
-        StringBuilder contenuMail = new StringBuilder("Merci pour votre achat !\n\nVoici les billets achetés :\n");
+        StringBuilder contenuHtml = new StringBuilder();
+        contenuHtml.append("<p>Merci pour votre achat, <strong>")
+                   .append(visiteur.getPrenom_visiteur()).append(" ")
+                   .append(visiteur.getNom_visiteur())
+                   .append("</strong> !</p>");
 
         for (Map<String, Object> billetMap : billets) {
             Long idBillet = Long.valueOf(billetMap.get("id").toString());
@@ -103,18 +94,16 @@ public class PaiementService {
             panier.setQuantite(1);
             panier.setPrix(billet.getPrix_billet().doubleValue());
 
-
             panierRepository.save(panier);
 
-            // Contenu de l'email
-            contenuMail.append("• ").append(billet.getType_billet())
-                       .append(" - ").append(billet.getPrix_billet())
-                       .append("€\n");
+            // Ajouter billet dans contenu email HTML
+            contenuHtml.append("<hr>")
+                       .append("<p><strong>Type :</strong> ").append(billet.getType_billet()).append("</p>")
+                       .append("<p><strong>Prix :</strong> ").append(billet.getPrix_billet()).append(" €</p>");
         }
 
-        // Envoi de l'email de confirmation
         try {
-            // Générer le QR Code à partir d'un identifiant unique ou contenu pertinent
+            // Générer QR Code personnalisé
             String qrText = "Achat JO Paris 2024 - " + email + " - " + LocalDateTime.now();
             byte[] qrCode = genererQrCode(qrText);
 
@@ -124,13 +113,11 @@ public class PaiementService {
             helper.setTo(email);
             helper.setSubject("Confirmation d'achat - JO Paris 2024");
 
-            // Contenu HTML avec QR intégré
-            String htmlContent = "<p>Merci pour votre achat !</p>" +
-                                 "<p>Voici votre QR Code :</p>" +
-                                 "<img src='cid:qrCodeImage' alt='QR Code' />" +
-                                 "<p>À bientôt aux JO 2024 !</p>";
+            contenuHtml.append("<p>Voici votre QR Code :</p>")
+                       .append("<img src='cid:qrCodeImage' alt='QR Code' width='200' height='200'/>")
+                       .append("<p>🎉 À très bientôt aux JO 2024 !</p>");
 
-            helper.setText(htmlContent, true);
+            helper.setText(contenuHtml.toString(), true);
             helper.addInline("qrCodeImage", new ByteArrayResource(qrCode), "image/png");
 
             mailSender.send(message);
@@ -139,8 +126,8 @@ public class PaiementService {
         } catch (Exception e) {
             logger.error("Erreur lors de l'envoi de l'email avec QR code à {}", email, e);
         }
-
     }
+
     private byte[] genererQrCode(String texte) throws Exception {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(texte, BarcodeFormat.QR_CODE, 200, 200);
@@ -150,5 +137,4 @@ public class PaiementService {
 
         return outputStream.toByteArray();
     }
-
 }
