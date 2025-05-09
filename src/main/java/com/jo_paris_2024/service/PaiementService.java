@@ -20,6 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import jakarta.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+
+
+
+
 @Service
 @Transactional
 public class PaiementService {
@@ -100,15 +114,41 @@ public class PaiementService {
 
         // Envoi de l'email de confirmation
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject("Confirmation d'achat - JO Paris 2024");
-            message.setText(contenuMail.toString());
+            // Générer le QR Code à partir d'un identifiant unique ou contenu pertinent
+            String qrText = "Achat JO Paris 2024 - " + email + " - " + LocalDateTime.now();
+            byte[] qrCode = genererQrCode(qrText);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(email);
+            helper.setSubject("Confirmation d'achat - JO Paris 2024");
+
+            // Contenu HTML avec QR intégré
+            String htmlContent = "<p>Merci pour votre achat !</p>" +
+                                 "<p>Voici votre QR Code :</p>" +
+                                 "<img src='cid:qrCodeImage' alt='QR Code' />" +
+                                 "<p>À bientôt aux JO 2024 !</p>";
+
+            helper.setText(htmlContent, true);
+            helper.addInline("qrCodeImage", new ByteArrayResource(qrCode), "image/png");
 
             mailSender.send(message);
-            logger.info("Email de confirmation envoyé à {}", email);
+            logger.info("Email de confirmation avec QR envoyé à {}", email);
+
         } catch (Exception e) {
-            logger.error("Erreur lors de l'envoi de l'email de confirmation à {}", email, e);
+            logger.error("Erreur lors de l'envoi de l'email avec QR code à {}", email, e);
         }
+
     }
+    private byte[] genererQrCode(String texte) throws Exception {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(texte, BarcodeFormat.QR_CODE, 200, 200);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+
+        return outputStream.toByteArray();
+    }
+
 }
