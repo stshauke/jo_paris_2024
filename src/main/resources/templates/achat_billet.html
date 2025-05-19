@@ -2,107 +2,94 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:insert="fragments/headerFragment :: headerFragment">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-   
 </head>
 <body>
- <style>
+<style>
     .btn-action {
-    width: 180px !important ; /* Vous pouvez ajuster cette valeur selon vos besoins */
-    text-align: center;
-    margin-bottom: 6px !important;
-}
-    </style>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4 text-secondary">Achat de Billets</h1>
+        width: 180px !important;
+        text-align: center;
+        margin-bottom: 6px !important;
+    }
+</style>
+<div class="container mt-5">
+    <h1 class="text-center mb-4 text-secondary">Achat de Billets</h1>
 
-        <!-- Tableau des billets disponibles -->
-        <h3 class="text-secondary">Liste des Billets Disponibles</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nom Offre</th>
-                    <th>Type</th>
-                    <th>Prix</th>
-                    <th>Stock</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="billetTableBody">
-                <!-- Les billets seront insérés dynamiquement -->
-            </tbody>
-        </table>
+    <h3 class="text-secondary">Liste des Billets Disponibles</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom Offre</th>
+            <th>Type</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="billetTableBody">
+        </tbody>
+    </table>
 
-        <!-- Tableau du panier -->
-        <h3 class="mt-5 text-secondary">Mon Panier</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID Billet</th>
-                    <th>Id Offre</th>
-                    <th>Type</th>
-                    <th>Prix</th>
-                    <th>Quantité</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="panierTableBody">
-                <!-- Les billets ajoutés au panier seront affichés ici -->
-            </tbody>
-        </table>
+    <h3 class="mt-5 text-secondary">Mon Panier</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID Billet</th>
+            <th>Id Offre</th>
+            <th>Type</th>
+            <th>Prix</th>
+            <th>Quantité</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="panierTableBody">
+        </tbody>
+    </table>
 
-        <!-- Bouton Payer -->
-        <div class="text-end mt-3">
-            <button id="payer" class="btn btn-success btn-action" style="color: #fff;background-color: #28a745;border-color: #28a745;" disabled>Payer</button>
-        </div>
-
-        <!-- Bouton Finaliser l'achat -->
-        <div class="text-end">
-            <button id="finaliserAchat" class="btn btn-primary btn-action" style="color: #fff;background-color: #0d6efd;border-color: #0d6efd;" disabled>Finaliser l'Achat</button>
-        </div>
+    <div class="text-end mt-3">
+        <button id="payer" class="btn btn-success btn-action" style="color: #fff;background-color: #28a745;border-color: #28a745;" disabled>Payer</button>
     </div>
 
- 
-    <script>
-        let panier = [];
+    <div class="text-end">
+        <button id="finaliserAchat" class="btn btn-primary btn-action" style="color: #fff;background-color: #0d6efd;border-color: #0d6efd;" disabled>Finaliser l'Achat</button>
+    </div>
+</div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-        	// Vérifier si l'utilisateur est connecté
-            if (!verifierConnexionOuRediriger()) return;
-            console.log("Page d'achat chargée");
-            
-            // Charger directement les billets sans vérification du token
-            loadBillets();
-            
-            // Écouter l'événement pour finaliser l'achat
-            document.getElementById('finaliserAchat').addEventListener('click', function() {
-                finaliserAchat();
-            });
-            
-            // Écouter l'événement pour effectuer le paiement
-            document.getElementById('payer').addEventListener('click', function() {
-                realPaiement();
-            });
+<script>
+    let panier = [];
 
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!verifierConnexionOuRediriger()) return;
+        console.log("Page d'achat chargée");
+
+        loadBillets();
+
+        document.getElementById('finaliserAchat').addEventListener('click', function () {
+            finaliserAchat();
         });
 
-        let offres = {};
+        document.getElementById('payer').addEventListener('click', function () {
+            realPaiement();
+        });
+    });
 
-        function loadBillets() {
-            const token = localStorage.getItem("jwtToken");
+    let offres = {};
 
-            fetch('/api/v1/offres/getAllOffres', {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token // Ajouter le token JWT
-                }
-            })
+    function loadBillets() {
+        const token = localStorage.getItem("jwtToken");
+
+        fetch('/api/v1/offres/getAllOffres', {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            }
+        })
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 401) {
                         alert("Accès refusé. Veuillez vous connecter.");
-                        window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                        window.location.href = "/connexion";
                     }
                     throw new Error("Erreur de récupération des offres.");
                 }
@@ -118,156 +105,148 @@
                     method: 'GET',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token // Ajouter le token JWT
+                        "Authorization": "Bearer " + token
                     }
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            alert("Accès refusé. Veuillez vous connecter.");
-                            window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 401) {
+                                alert("Accès refusé. Veuillez vous connecter.");
+                                window.location.href = "/connexion";
+                            }
+                            throw new Error("Erreur de récupération des billets.");
                         }
-                        throw new Error("Erreur de récupération des billets.");
-                    }
-                    return response.json();
-                })
-                .then(billets => {
-                    const tableBody = document.getElementById('billetTableBody');
-                    tableBody.innerHTML = '';
+                        return response.json();
+                    })
+                    .then(billets => {
+                        const tableBody = document.getElementById('billetTableBody');
+                        tableBody.innerHTML = '';
 
-                    billets.forEach(billet => {
-                        const nomOffre = offres[billet.id_offre] || 'Inconnu';
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${billet.id_billet}</td>
-                            <td>${nomOffre}</td>
-                            <td>${billet.type_billet}</td>
-                            <td>${billet.prix_billet}</td>
-                            <td>${billet.stock}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" onclick="ajouterAuPanier(${billet.id_billet}, ${billet.id_offre}, '${billet.type_billet}', ${billet.prix_billet})">
-                                    <i class="fas fa-cart-plus"></i> Ajouter au Panier
-                                </button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Erreur lors du chargement des billets:', error));
+                        billets.forEach(billet => {
+                            const nomOffre = offres[billet.id_offre] || 'Inconnu';
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${billet.id_billet}</td>
+                                <td>${nomOffre}</td>
+                                <td>${billet.type_billet}</td>
+                                <td>${billet.prix_billet}</td>
+                                <td>${billet.stock}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="ajouterAuPanier(${billet.id_billet}, ${billet.id_offre}, '${billet.type_billet}', ${billet.prix_billet})">
+                                        <i class="fas fa-cart-plus"></i> Ajouter au Panier
+                                    </button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des billets:', error));
             })
             .catch(error => console.error('Erreur lors du chargement des offres:', error));
-        }
+    }
 
-        function ajouterAuPanier(id, nomOffre, type, prix) {
-            // Ajoutez une nouvelle entrée dans le panier pour chaque billet sélectionné
-            panier.push({ id, nomOffre, type, prix });
-            // Afficher le panier mis à jour
-            afficherPanier();
-        }
+    function ajouterAuPanier(id, nomOffre, type, prix) {
+        panier.push({id, nomOffre, type, prix});
+        afficherPanier();
+    }
 
-        function afficherPanier() {
-            const tableBody = document.getElementById('panierTableBody');
-            tableBody.innerHTML = '';
-            panier.forEach(billet => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${billet.id}</td>
-                    <td>${billet.nomOffre}</td>
-                    <td>${billet.type}</td>
-                    <td>${billet.prix}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="retirerDuPanier(${billet.id})">
-                            <i class="fas fa-trash-alt"></i> Retirer
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+    function afficherPanier() {
+        const tableBody = document.getElementById('panierTableBody');
+        tableBody.innerHTML = '';
+        panier.forEach(billet => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${billet.id}</td>
+                <td>${billet.nomOffre}</td>
+                <td>${billet.type}</td>
+                <td>${billet.prix}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="retirerDuPanier(${billet.id})">
+                        <i class="fas fa-trash-alt"></i> Retirer
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        document.getElementById('payer').disabled = panier.length === 0;
+        document.getElementById('payer').hidden = panier.length === 0;
+    }
+
+    function retirerDuPanier(id) {
+        panier = panier.filter(billet => billet.id !== id);
+        afficherPanier();
+    }
+
+    async function realPaiement() {
+        const stripe = Stripe("pk_test_51RL55YGdpCU3R65m7AtsOKAL15BZtByse4QAJ2tLVILxCsRT61ZwRjZZXLpeXBBlsD2lAD6RW0qIiupNZGruHXpu00BqpB1YmP");
+
+        const email = localStorage.getItem("emailVisiteur");
+        const panierDTO = panier.map(b => ({
+            id: b.id,
+            type: b.type,
+            prix: b.prix
+        }));
+
+        try {
+            const cacheResponse = await fetch("/api/v1/paiement/cache-session", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    email: email,
+                    billets: panierDTO
+                })
             });
 
-            // Si le panier est vide, le bouton "Payer" est désactivé
-            document.getElementById('payer').disabled = panier.length === 0;
-            // Si le panier contient des éléments, le bouton "Payer" est visible
-            document.getElementById('payer').hidden = panier.length === 0;
-        }
-
-        function retirerDuPanier(id) {
-            panier = panier.filter(billet => billet.id !== id);
-            afficherPanier();
-        }
-
-        async function realPaiement() {
-            const stripe = Stripe("pk_test_51RL55YGdpCU3R65m7AtsOKAL15BZtByse4QAJ2tLVILxCsRT61ZwRjZZXLpeXBBlsD2lAD6RW0qIiupNZGruHXpu00BqpB1YmP");
-
-            const email = localStorage.getItem("emailVisiteur");
-            const panierDTO = panier.map(b => ({
-                id: b.id,
-                type: b.type,
-                prix: b.prix
-            }));
-
-            try {
-                // ✅ Étape 1 : enregistrer email + panier dans la session côté backend
-                const cacheResponse = await fetch("/api/v1/paiement/cache-session", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email: email,
-                        billets: panierDTO
-                    })
-                });
-
-                if (!cacheResponse.ok) {
-                    throw new Error("Erreur lors de la mise en cache du panier avant redirection Stripe.");
-                }
-
-                // ✅ Étape 2 : créer une session Stripe et rediriger
-                const response = await fetch("/api/v1/payment/create-checkout-session", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(panierDTO)
-                });
-
-                if (!response.ok) {
-                    throw new Error("Erreur lors de la création de la session Stripe");
-                }
-
-                const data = await response.json();
-
-                // ✅ Étape 3 : rediriger vers Stripe Checkout
-                const result = await stripe.redirectToCheckout({
-                    sessionId: data.id
-                });
-
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            } catch (err) {
-                console.error("Erreur Stripe :", err);
-                alert("Une erreur est survenue lors du paiement.");
-            }
-        }
-
-
-        function finaliserAchat() {
-            const token = localStorage.getItem("jwtToken");
-            const emailVisiteur = localStorage.getItem("emailVisiteur");
-
-            if (!emailVisiteur || !token) {
-                alert("Utilisateur non authentifié. Veuillez vous connecter.");
-                return;
+            if (!cacheResponse.ok) {
+                throw new Error("Erreur lors de la mise en cache du panier avant redirection Stripe.");
             }
 
-            fetch(`/api/v1/visiteurs/email/${emailVisiteur}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token // Ajout du token
-                }
-            })
+            const response = await fetch("/api/v1/payment/create-checkout-session", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(panierDTO)
+            });
+
+            if (!response.ok) {
+                throw new Error("Erreur lors de la création de la session Stripe");
+            }
+
+            const data = await response.json();
+
+            const result = await stripe.redirectToCheckout({
+                sessionId: data.id
+            });
+
+            if (result.error) {
+                alert(result.error.message);
+            }
+        } catch (err) {
+            console.error("Erreur Stripe :", err);
+            alert("Une erreur est survenue lors du paiement.");
+        }
+    }
+
+    function finaliserAchat() {
+        const token = localStorage.getItem("jwtToken");
+        const emailVisiteur = localStorage.getItem("emailVisiteur");
+
+        if (!emailVisiteur || !token) {
+            alert("Utilisateur non authentifié. Veuillez vous connecter.");
+            return;
+        }
+
+        fetch(`/api/v1/visiteurs/email/${emailVisiteur}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            }
+        })
             .then(response => {
                 if (!response.ok) {
                     alert("Accès refusé. Veuillez vous reconnecter.");
-                    window.location.href = "/connexion"; // Rediriger vers la page de connexion
+                    window.location.href = "/connexion";
                 }
                 return response.json();
             })
@@ -282,8 +261,7 @@
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
-                       
-                        "Authorization": "Bearer " + token // Ajout du token
+                        "Authorization": "Bearer " + token
                     },
                     body: JSON.stringify(panierDTO)
                 });
@@ -294,33 +272,19 @@
                 panier = [];
                 afficherPanier();
                 document.getElementById('finaliserAchat').disabled = true;
-                loadBillets(); // Recharger les billets après finalisation
+                loadBillets();
             })
             .catch(error => {
                 console.error('Erreur lors de l\'ajout du panier:', error);
                 alert("Une erreur est survenue.");
             });
-        }
-    </script>
-    
-    <!-- Scripts à la fin -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- Stripe.js doit venir avant ton script personnalisé -->
-    <script src="https://js.stripe.com/v3/"></script>
-    
-    <!-- Ton script auth.js OU script inline -->
-    <script src="/js/auth.js"></script>
+    }
+</script>
 
-    <!-- Ton script inline (celui que tu m’as montré) -->
-    <script>
-        // tout ton code ici (inchangé)
-    </script>
-</body>
-    
-    
-    
+<!-- Scripts à la fin -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/js/auth.js"></script>
 </body>
 </html>
-                       
